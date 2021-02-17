@@ -1,4 +1,4 @@
-function h=nnchainp(a,b,varargin)
+function h = NNChainP(a,b,varargin)
 %	Defines a Hamiltonian with a(k)b(k+1) nearest-neighbor
 %   and periodic boundary condition.
 %   nnchainp (a,b,n) defines a a(k)b(k+1) type Hamiltonian
@@ -12,14 +12,16 @@ else
     if length(varargin)~=1,
         error('Wrong number of input arguments.')
     end %if
-    N=varargin{1};
-end %if
-h=sparse(2^N,2^N);
-op=kron(a,b);
-for n=1:N-1
-    h=h+kron(kron(speye(2^(n-1)),op),speye(2^(N-n-1)));
-end %for
+    N = varargin{1};
+end
+
+h = sparse(2^N,2^N);
+op = kron(a,b);
+for n = 1:N-1
+    h = h+kron(kron(speye(2^(n-1)),op),speye(2^(N-n-1)));
+end
+
 % Periodic boundary conditions
-if N>1,
-   h=h+kron(kron(b,speye(2^(n-1))),kron(speye(2^(N-n-1)),a));
-end %for
+if N > 1
+   h = h+kron(kron(b,speye(2^(n-1))),kron(speye(2^(N-n-1)),a));
+end

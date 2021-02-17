@@ -1,5 +1,5 @@
-function cor = correlation(A)
-% Computes the correlation function of A 
+function cor = CorrelationFun(A)
+% Computes the correlation function of A
 % Output is centered at size(A)/2 because of the periodic boundary
 % conditions
 
