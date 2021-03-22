@@ -1,5 +1,5 @@
 function R = RadialAverage(cor,N)
-% find the radial average of the NxN correlation function cor
+% find the radial average of the NxN correlation function, cor
 % (average out the angular dependence from a 2D connected correlation function)
 
 L = ceil(N/2);
