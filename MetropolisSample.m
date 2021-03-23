@@ -1,4 +1,4 @@
-function [grid,E] = MetropolisSample(N,kT,J,numTimePoints,grid,doHeatBath,timeLag)
+function [grid,energyStore,M_store] = MetropolisSample(N,kT,J,numTimePoints,grid,doHeatBath,timeLag)
 % Metropolis sampling for the 2D Ising model
 %-------------------------------------------------------------------------------
 if nargin < 6
@@ -11,11 +11,13 @@ end
 %-------------------------------------------------------------------------------
 % Plot initial spin configuration
 %-------------------------------------------------------------------------------
-M = sum(sum(grid))/numel(grid);
-energyStore = zeros(numTimePoints,1);
+M_store = zeros(floor(numTimePoints/N^2),1);
+energyStore = zeros(floor(numTimePoints/N^2),1);
+M(1) = sum(grid(:))/numel(grid);
 E(1) = IsingEnergy(grid,J);
-figure(1);
-IsingPlot(grid,N,J,kT,M,E);
+f1 = figure(1);
+f1.Color = 'w';
+IsingPlot(grid,N,J,kT,M(1),E(1));
 
 %-------------------------------------------------------------------------------
 % Evolve the Markov chain for a fixed number of steps
@@ -57,12 +59,17 @@ for t = 1:numTimePoints
             end
         end
     end
+
     % Refresh display of current spin configuration every N^2 trials
-    if mod(t,N^2)==0,
-        % Sum up our variables of interest and plot
-        M = sum(sum(grid))/numel(grid);
+    if mod(t,N^2)==0
+        % Sum up our variables of interest and plot:
+        M = sum(grid(:))/numel(grid);
         E = IsingEnergy(grid,J);
         IsingPlot(grid,N,J,kT,M,E);
+        % Store for later:
+        energyStore(t/N^2) = E;
+        M_store(t/N^2) = M;
+        % Pause if required:
         if timeLag > 0
             pause(timeLag)
         end
