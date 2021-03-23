@@ -1,5 +1,6 @@
 function grid = ProppWilson(N,kT,J)
 % Exact sampling of the Ising Model via the Propp-Wilson algorithm
+%-------------------------------------------------------------------------------
 
 % Intialization
 grid = ones(N,N,2); grid(:,:,2) = -grid(:,:,2);

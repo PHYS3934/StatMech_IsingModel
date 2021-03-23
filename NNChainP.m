@@ -1,10 +1,11 @@
 function h = NNChainP(a,b,varargin)
-%	Defines a Hamiltonian with a(k)b(k+1) nearest-neighbor
-%   and periodic boundary condition.
-%   nnchainp (a,b,n) defines a a(k)b(k+1) type Hamiltonian
-%   with periodic boundary conditions.
-%   If argument n is omitted than the default is taking to be
-%   the value of global variable N.
+% Defines a Hamiltonian with a(k)b(k+1) nearest-neighbor
+% and periodic boundary condition.
+% NNChainP(a,b,n) defines a a(k)b(k+1) type Hamiltonian
+% with periodic boundary conditions.
+% If argument n is omitted than the default is taking to be
+% the value of global variable N.
+%-------------------------------------------------------------------------------
 
 if isempty(varargin),
     global N;
