@@ -2,13 +2,13 @@
 % SET PARAMETERS
 %-------------------------------------------------------------------------------
 % kT, rescaled temperature
-kT = 1;
+kT = 2.3;
 % N, linear lattice size
-N = 50;
+N = 200;
 % J, coupling strength (change sign for antiferromagnetic coupling!)
 J = 1;
 % numTimePoints, number of update steps (use large multiple of N^2 for Metropolis)
-numTimePoints = 20*N^2;
+numTimePoints = 500*N^2;
 % reInitialize, whether to generate a new initial condition (or continue from previous)
 reInitialize = true;
 % p, average proportion of initial +1 spins
@@ -16,7 +16,7 @@ p = 0.5; % (0.5 for random initial condition)
 % samplingMethod, 'HeatBath', 'Metropolis' or 'Wolff'
 samplingMethod = 'Metropolis';
 % timeLag
-timeLag = 0; % slow down plotting
+timeLag = 0; % option to slow down plotting
 
 %-------------------------------------------------------------------------------
 % Generate a random initial configuration
@@ -72,7 +72,7 @@ caxis([0,min(0.3,max(corrMatrix(:)))])
 subplot(122)
 R = RadialAverage(corrMatrix,N);
 plot(R);
-xlabel('angle')
+xlabel('Distance')
 ylabel('Correlation')
 title('Radial average')
 

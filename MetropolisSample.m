@@ -13,11 +13,11 @@ end
 %-------------------------------------------------------------------------------
 M_store = zeros(floor(numTimePoints/N^2),1);
 energyStore = zeros(floor(numTimePoints/N^2),1);
-M(1) = sum(grid(:))/numel(grid);
-E(1) = IsingEnergy(grid,J);
+M_store(1) = sum(grid(:))/numel(grid);
+energyStore(1) = IsingEnergy(grid,J);
 f1 = figure(1);
 f1.Color = 'w';
-IsingPlot(grid,N,J,kT,M(1),E(1));
+h_Image = IsingPlot(grid,N,J,kT,M_store(1),energyStore(1));
 
 %-------------------------------------------------------------------------------
 % Evolve the Markov chain for a fixed number of steps
@@ -65,7 +65,7 @@ for t = 1:numTimePoints
         % Sum up our variables of interest and plot:
         M = sum(grid(:))/numel(grid);
         E = IsingEnergy(grid,J);
-        IsingPlot(grid,N,J,kT,M,E);
+        h_Image = IsingPlot(grid,N,J,kT,M,E,h_Image);
         % Store for later:
         energyStore(t/N^2) = E;
         M_store(t/N^2) = M;
