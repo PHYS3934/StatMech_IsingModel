@@ -15,9 +15,9 @@ p = 1-exp(-2*J/kT);
 for j = 1:t,
     % Identify clusters and flip them t times using the Wolff algorithm
 	C = OneWolff(N,p,grid,adj);
-	grid(C) = -1*grid(C);
+	grid(C) = -grid(C);
     % Plot the relevant variables
-    if mod(j,N^2)==0,
+    if mod(j,N^2)==0
         M = sum(sum(grid))/N^2;
         E = IsingEnergy(grid,J);
         IsingPlot(grid,N,J,kT,M,E);

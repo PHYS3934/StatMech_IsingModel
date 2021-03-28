@@ -2,19 +2,19 @@
 % SET PARAMETERS
 %-------------------------------------------------------------------------------
 % kT, rescaled temperature
-kT = 2.3;
+kT = 2.2;
 % N, linear lattice size
-N = 200;
+N = 100;
 % J, coupling strength (change sign for antiferromagnetic coupling!)
 J = 1;
 % numTimePoints, number of update steps (use large multiple of N^2 for Metropolis)
-numTimePoints = 500*N^2;
+numTimePoints = 10*N^2;
 % reInitialize, whether to generate a new initial condition (or continue from previous)
 reInitialize = true;
 % p, average proportion of initial +1 spins
 p = 0.5; % (0.5 for random initial condition)
 % samplingMethod, 'HeatBath', 'Metropolis' or 'Wolff'
-samplingMethod = 'Metropolis';
+samplingMethod = 'Wolff';
 % timeLag
 timeLag = 0; % option to slow down plotting
 
@@ -29,19 +29,7 @@ end
 %-------------------------------------------------------------------------------
 % Run the sampling algorithm
 %-------------------------------------------------------------------------------
-switch samplingMethod
-case 'HeatBath'
-    doHeatBath = true;
-    [finalGrid,energies,magnetizations] = MetropolisSample(N,kT,J,numTimePoints,grid,doHeatBath,timeLag);
-case 'Metropolis'
-    doHeatBath = false;
-    [finalGrid,energies,magnetizations] = MetropolisSample(N,kT,J,numTimePoints,grid,doHeatBath,timeLag);
-case 'Wolff'
-    numTimePoints = N^2; % run with t update steps
-    finalGrid = WolffSample(N,kT,J,numTimePoints,grid);
-otherwise
-    error('Unknown sampling method ''%s''',samplingMethod);
-end
+[finalGrid,energies,magnetizations] = SampleGrid(N,kT,J,numTimePoints,grid,samplingMethod,timeLag);
 
 %-------------------------------------------------------------------------------
 % Compute final magnetization density and energy density
