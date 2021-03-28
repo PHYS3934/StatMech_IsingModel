@@ -1,4 +1,4 @@
-function [grid,energyStore,M_store] = SampleGrid(N,kT,J,numTimePoints,grid,sampleHow,timeLag)
+function [grid,energyStore,M_store] = SampleGrid(grid,kT,J,numTimePoints,everyT,sampleHow,timeLag)
 % Metropolis sampling for the 2D Ising model
 %-------------------------------------------------------------------------------
 if nargin < 6
@@ -11,6 +11,8 @@ end
 %-------------------------------------------------------------------------------
 % Preparation
 %-------------------------------------------------------------------------------
+N = size(grid,1);
+
 % Precompute the indicies adjacent to each spin index
 adj = myNeighbors(1:N^2,N);
 
@@ -18,10 +20,8 @@ switch sampleHow
 case {'HeatBath','Metropolis'}
     % Precompute a sequence of random spins (with a linear index)
     spin = randi(N^2,numTimePoints,1);
-    everyT = N^2;
 case 'Wolff'
-    p = 1-exp(-2*J/kT);
-    everyT = N;
+    p = 1 - exp(-2*J/kT);
 end
 
 %-------------------------------------------------------------------------------
@@ -70,8 +70,8 @@ for t = 1:numTimePoints
             end
         end
     case 'Wolff'
-        % Identify clusters and flip them t times using the Wolff algorithm
-    	C = OneWolff(N,p,grid,adj);
+        % Identify a cluster to flip using the Wolff algorithm
+    	C = WolfIteration(N,p,grid,adj,false);
         grid(C) = -grid(C);
     otherwise
         error('Unknown sampling method ''%s''',samplingMethod);
@@ -93,30 +93,5 @@ for t = 1:numTimePoints
     end
 end
 
-%-------------------------------------------------------------------------------
-% Wolff iteraction
-%-------------------------------------------------------------------------------
-function C = OneWolff(N,p,grid,adj)
-	% Find a cluster, C, according the the Wolff sampling rule
-
-	i = randi(N^2); % random seed spin
-	C = i; % the cluster
-	F = i; % the frontier of spins
-	s = grid(i); % seed spin direction
-	Ci = zeros(N^2,1); % indicator function for cluster elements
-
-    while ~isempty(F)
-        F = adj(F,:); % Compute the new neighboring spins
-        F = F(grid(F(:)) == s);% only choose ones parallel to the seed spin
-        % find elements that aren't in the cluster
-        Fi = zeros(N^2,1);% indicator function for the frontier spins
-        Ci(C) = 1;
-        Fi(F) = 1;
-        F = find(Fi - Ci > 0);
-        F = F(rand(1,length(F)) < p); % keep spins only with probability p
-        C(end+1:end+length(F)) = F; % add to cluster
-	end
-
-end
 
 end

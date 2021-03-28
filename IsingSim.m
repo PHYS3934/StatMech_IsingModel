@@ -9,6 +9,8 @@ N = 100;
 J = 1;
 % numTimePoints, number of update steps (use large multiple of N^2 for Metropolis)
 numTimePoints = 10*N^2;
+% everyT, plot and store the energy/magnetization of the grid everyT iterations
+everyT = N^2;
 % reInitialize, whether to generate a new initial condition (or continue from previous)
 reInitialize = true;
 % p, average proportion of initial +1 spins
@@ -29,12 +31,8 @@ end
 %-------------------------------------------------------------------------------
 % Run the sampling algorithm
 %-------------------------------------------------------------------------------
-[finalGrid,energies,magnetizations] = SampleGrid(N,kT,J,numTimePoints,grid,samplingMethod,timeLag);
-
-%-------------------------------------------------------------------------------
-% Compute final magnetization density and energy density
-M = sum(finalGrid(:))/numel(finalGrid);
-E = IsingEnergy(finalGrid,J);
+[finalGrid,energies,magnetizations] = ...
+                SampleGrid(grid,kT,J,numTimePoints,everyT,samplingMethod,timeLag);
 
 %-------------------------------------------------------------------------------
 % Plotting:
@@ -70,7 +68,7 @@ if exist('energies','var')
     f3.Color = 'w';
     subplot(221)
     plot(energies)
-    xlabel('time (intervals of N^2)');
+    xlabel(sprintf('time (iterations/%u)',everyT));
     ylabel('energy')
     subplot(222)
     histogram(energies)
@@ -78,7 +76,7 @@ if exist('energies','var')
     ylabel('frequency')
     subplot(223)
     plot(magnetizations)
-    xlabel('time (intervals of N^2)');
+    xlabel(sprintf('time (iterations/%u)',everyT));
     ylabel('magnetization')
     subplot(224)
     histogram(magnetizations)
