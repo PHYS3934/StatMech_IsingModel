@@ -71,7 +71,7 @@ for t = 1:numTimePoints
         end
     case 'Wolff'
         % Identify a cluster to flip using the Wolff algorithm
-    	C = WolfIteration(N,p,grid,adj,false);
+    	C = WolffIteration(N,p,grid,adj);
         grid(C) = -grid(C);
     otherwise
         error('Unknown sampling method ''%s''',samplingMethod);

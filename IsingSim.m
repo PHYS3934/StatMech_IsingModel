@@ -2,13 +2,13 @@
 % SET PARAMETERS
 %-------------------------------------------------------------------------------
 % kT, rescaled temperature
-kT = 2.2;
+kT = 1;
 % N, linear lattice size
-N = 100;
+N = 50;
 % J, coupling strength (change sign for antiferromagnetic coupling!)
 J = 1;
 % numTimePoints, number of update steps (use large multiple of N^2 for Metropolis)
-numTimePoints = 10*N^2;
+numTimePoints = 20*N^2;
 % everyT, plot and store the energy/magnetization of the grid everyT iterations
 everyT = N^2;
 % reInitialize, whether to generate a new initial condition (or continue from previous)
