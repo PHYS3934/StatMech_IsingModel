@@ -1,4 +1,9 @@
+% Parameters:
 N = 20; % grid size
+J = 1;
+kT = 2.3;
+
+%-------------------------------------------------------------------------------
 grid0 = sign(0.5-rand(N)); % random initial configuration
 grid = grid0;
 f = figure('color','w');
@@ -26,8 +31,6 @@ title(r)
 
 %-------------------------------------------------------------------------------
 % Compute cluster growth probability (based on J/kT)
-J = 1;
-kT = 3;
 p = 1 - exp(-2*J/kT);
 fprintf(1,'Iteratively add neighbor to cluster with probability %.3f\n',p);
 
