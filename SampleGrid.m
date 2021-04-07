@@ -1,5 +1,9 @@
 function [grid,energyStore,M_store] = SampleGrid(grid,kT,J,numTimePoints,everyT,sampleHow,timeLag)
-% Metropolis sampling for the 2D Ising model
+% Sampling algorithms for the 2D Ising model
+%-------------------------------------------------------------------------------
+
+%-------------------------------------------------------------------------------
+% Check inputs and set defaults
 %-------------------------------------------------------------------------------
 if nargin < 6
     sampleHow = 'Metropolis';
@@ -25,7 +29,7 @@ case 'Wolff'
 end
 
 %-------------------------------------------------------------------------------
-% Plot initial spin configuration
+% Plot the initial spin configuration
 %-------------------------------------------------------------------------------
 M_store = zeros(floor(numTimePoints/everyT),1);
 energyStore = zeros(floor(numTimePoints/everyT),1);
@@ -54,9 +58,11 @@ for t = 1:numTimePoints
         else
             grid(s) = 1;
         end
+
     case 'Metropolis'
         % Index, s, of the spin to consider flipping:
         s = spin(t);
+        % Compute the change in energy from flipping this spin:
         deltaE = 2*J*grid(s)*sum(grid(adj(s,:)));
         if deltaE < 0
             % Always flip to lower energy
@@ -64,15 +70,17 @@ for t = 1:numTimePoints
         else
             % Calculate the transition probability
             p = exp(-deltaE/kT);
-            % Decide if a transition will occur
+            % A transition to higher energy occurs with probability p:
             if rand <= p
                 grid(s) = -grid(s);
             end
         end
+
     case 'Wolff'
         % Identify a cluster to flip using the Wolff algorithm
     	C = WolffIteration(N,p,grid,adj);
         grid(C) = -grid(C);
+
     otherwise
         error('Unknown sampling method ''%s''',samplingMethod);
     end

@@ -4,7 +4,7 @@
 % kT, rescaled temperature
 kT = 1;
 % N, linear lattice size
-N = 50;
+N = 30;
 % J, coupling strength (change sign for antiferromagnetic coupling!)
 J = 1;
 % numTimePoints, number of update steps (use large multiple of N^2 for Metropolis)
@@ -32,7 +32,7 @@ end
 % Run the sampling algorithm
 %-------------------------------------------------------------------------------
 [finalGrid,energies,magnetizations] = ...
-                SampleGrid(grid,kT,J,numTimePoints,everyT,samplingMethod,timeLag);
+            SampleGrid(grid,kT,J,numTimePoints,everyT,samplingMethod,timeLag);
 
 %-------------------------------------------------------------------------------
 % Plotting:
