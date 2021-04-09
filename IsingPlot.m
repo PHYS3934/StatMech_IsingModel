@@ -8,7 +8,6 @@ if nargin < 7
 end
 
 %-------------------------------------------------------------------------------
-% Update:
 if isempty(h_Image)
     % Initialize:
     h_Image = imagesc((grid+1)*128);
@@ -18,6 +17,7 @@ if isempty(h_Image)
     ax = gca();
     ax.XTickLabel = [];
     ax.YTickLabel = [];
+    caxis([-1,1])
 else
     % Update
     h_Image.CData = (grid+1)*128;
