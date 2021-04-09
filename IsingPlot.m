@@ -8,16 +8,16 @@ if nargin < 7
 end
 
 %-------------------------------------------------------------------------------
-% Update:
 if isempty(h_Image)
     % Initialize:
     h_Image = imagesc((grid+1)*128);
     title(sprintf('2D Ising model with %0.4g by %0.4g lattice',N,N));
     axis('square');
-    colormap('bone');
+    colormap([0,0,0;1,1,1]);
     ax = gca();
     ax.XTickLabel = [];
     ax.YTickLabel = [];
+    caxis([-1,1])
 else
     % Update
     h_Image.CData = (grid+1)*128;
