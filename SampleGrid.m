@@ -39,10 +39,8 @@ f1 = figure(1);
 f1.Color = 'w';
 subplot(1,2,1)
 h_Image = IsingPlot(grid,N,J,kT,M_store(1),energyStore(1));
-caxis([-1,1])
 subplot(1,2,2)
-h_ImageSmall = IsingPlot(CoarseGrain(grid),N,J,kT,M_store(1),energyStore(1));
-caxis([-1,1])
+h_ImageSmall = IsingPlot(CoarseGrain(grid));
 
 %-------------------------------------------------------------------------------
 % Evolve the Markov chain for numTimePoints iterations
