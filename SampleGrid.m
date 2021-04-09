@@ -37,7 +37,12 @@ M_store(1) = sum(grid(:))/numel(grid);
 energyStore(1) = IsingEnergy(grid,J);
 f1 = figure(1);
 f1.Color = 'w';
+subplot(1,2,1)
 h_Image = IsingPlot(grid,N,J,kT,M_store(1),energyStore(1));
+caxis([-1,1])
+subplot(1,2,2)
+h_ImageSmall = IsingPlot(CoarseGrain(grid),N,J,kT,M_store(1),energyStore(1));
+caxis([-1,1])
 
 %-------------------------------------------------------------------------------
 % Evolve the Markov chain for numTimePoints iterations
@@ -91,6 +96,7 @@ for t = 1:numTimePoints
         M = sum(grid(:))/numel(grid);
         E = IsingEnergy(grid,J);
         h_Image = IsingPlot(grid,N,J,kT,M,E,h_Image);
+        h_ImageSmall = IsingPlot(CoarseGrain(grid),N,J,kT,M,E,h_ImageSmall);
         % Store for later:
         energyStore(t/everyT) = E;
         M_store(t/everyT) = M;
