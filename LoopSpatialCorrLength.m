@@ -8,13 +8,13 @@
 % SET PARAMETERS
 %-------------------------------------------------------------------------------
 % N, linear lattice size
-N = 50;
+N = 100;
 % J, coupling strength (change sign for antiferromagnetic coupling!)
 J = 1;
 % numTimePoints, number of update steps (use large multiple of N^2 for Metropolis)
-numTimePoints = 200*N^2;
+numTimePoints = 1000*N^2;
 % everyT, plot and store the energy/magnetization of the grid everyT iterations
-everyT = N^2;
+everyT = 100*N^2;
 % reInitialize, whether to generate a new initial condition (or continue from previous)
 reInitialize = true;
 % p, average proportion of initial +1 spins
@@ -27,7 +27,7 @@ timeLag = 0; % option to slow down plotting
 %-------------------------------------------------------------------------------
 % Run the sampling algorithm
 %-------------------------------------------------------------------------------
-kT = 1:0.1:4;
+kT = 2:0.02:2.5;
 numkT = length(kT);
 numRepeats = 5;
 lambda = zeros(numkT,numRepeats);
@@ -44,7 +44,7 @@ for i = 1:numkT
         else
             lambda(i,r) = firstDrop;
         end
-        fprintf(1,'kT = %.1f, lambda = %.1f\n',kT(i),lambda(i));
+        fprintf(1,'kT = %.2f, lambda = %.0f\n',kT(i),lambda(i));
     end
 end
 
@@ -55,9 +55,10 @@ lambdaStd = std(lambda,0,2);
 f = figure('color','w');
 hold('on')
 % plot(kT,lambdaMean,'o-k')
-errorbar(kT,lambdaMean,lambdaStd,'o-k')
-plot(2/log(1+sqrt(2))*ones(2,1),[0,N/2],'LineWidth',2)
-plot([min(kT),max(kT)],ones(2,1)*N/2,'--b','LineWidth',2)
+plot([min(kT),max(kT)],ones(2,1)*N/2,'--','color',ones(3,1)*0.5,'LineWidth',1)
+plot(2/log(1+sqrt(2))*ones(2,1),[0,N/2],'LineWidth',1)
+errorbar(kT,lambdaMean,lambdaStd,'o-k','LineWidth',1.5)
 xlabel('kT')
 ylabel('Correlation length')
 title(sprintf('%u x %u lattice',N,N))
+ylim([0,N/2])
