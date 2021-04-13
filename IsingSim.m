@@ -34,6 +34,8 @@ timeLag = 0; % option to slow down plotting
 % Comment out to keep sampling with the previous configuration.
 if reInitialize
     grid = sign(p-rand(N)); % random initial configuration
+else
+    grid = finalGrid; % from last time
 end
 
 %-------------------------------------------------------------------------------

@@ -11,7 +11,7 @@ clusterSizes = [[SS1.Area],[SS2.Area]]; % cluster areas
 %-------------------------------------------------------------------------------
 % Logarithmic binning
 %-------------------------------------------------------------------------------
-numBins = ceil(min(length(unique(clusterSizes)/5),15));
+numBins = ceil(min(length(unique(clusterSizes)/5),12));
 
 % log10-spaced bin edges:
 binEdges = logspace(log10(min(clusterSizes*0.9999)),log10(max(clusterSizes*1.0001)),numBins);
