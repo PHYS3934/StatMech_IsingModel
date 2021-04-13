@@ -5,7 +5,7 @@
 kTc = 2/log(1+sqrt(2));
 kT = kTc*1.0;
 % N, linear lattice size
-N = 300;
+N = 500;
 % J, coupling strength (change sign for antiferromagnetic coupling!)
 J = 1;
 % reInitialize, whether to generate a new initial condition (or continue from previous)
@@ -17,9 +17,9 @@ samplingMethod = 'Wolff';
 switch samplingMethod
 case 'Wolff'
     % numTimePoints, number of update steps (use large multiple of N^2 for Metropolis)
-    numTimePoints = 40*N;
+    numTimePoints = 80*N;
     % everyT, plot and store the energy/magnetization of the grid everyT iterations
-    everyT = 0.2*N;
+    everyT = N;
 case 'Metropolis'
     % numTimePoints, number of update steps (use large multiple of N^2 for Metropolis)
     numTimePoints = 200*N^2;
@@ -35,6 +35,8 @@ timeLag = 0; % option to slow down plotting
 % Comment out to keep sampling with the previous configuration.
 if reInitialize
     grid = sign(p-rand(N)); % random initial configuration
+else
+    grid = finalGrid;
 end
 
 %-------------------------------------------------------------------------------
