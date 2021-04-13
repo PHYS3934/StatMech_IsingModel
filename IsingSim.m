@@ -5,7 +5,7 @@
 kTc = 2/log(1+sqrt(2));
 kT = kTc*1.0;
 % N, linear lattice size
-N = 250;
+N = 300;
 % J, coupling strength (change sign for antiferromagnetic coupling!)
 J = 1;
 % reInitialize, whether to generate a new initial condition (or continue from previous)
