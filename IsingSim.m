@@ -5,7 +5,7 @@
 kTc = 2/log(1+sqrt(2));
 kT = kTc*1.0;
 % N, linear lattice size
-N = 500;
+N = 100;
 % J, coupling strength (change sign for antiferromagnetic coupling!)
 J = 1;
 % reInitialize, whether to generate a new initial condition (or continue from previous)
@@ -13,7 +13,8 @@ reInitialize = true;
 % p, average proportion of initial +1 spins
 p = 0.5; % (0.5 for random initial condition)
 % samplingMethod, 'HeatBath', 'Metropolis' or 'Wolff'
-samplingMethod = 'Wolff';
+samplingMethod = 'Metropolis';
+
 switch samplingMethod
 case 'Wolff'
     % numTimePoints, number of update steps (use large multiple of N^2 for Metropolis)

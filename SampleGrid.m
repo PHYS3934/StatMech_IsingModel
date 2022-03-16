@@ -31,13 +31,13 @@ end
 %-------------------------------------------------------------------------------
 % Plot the initial spin configuration
 %-------------------------------------------------------------------------------
-% M_store = zeros(floor(numTimePoints/everyT),1);
-% energyStore = zeros(floor(numTimePoints/everyT),1);
-% M_store(1) = mean(grid(:));
-% energyStore(1) = IsingEnergy(grid,J);
+M_store = zeros(floor(numTimePoints/everyT),1);
+energyStore = zeros(floor(numTimePoints/everyT),1);
+M_store(1) = mean(grid(:));
+energyStore(1) = IsingEnergy(grid,J);
 f1 = figure(1);
 f1.Color = 'w';
-% h_Image = IsingPlot(grid,N,J,kT,M_store(1),energyStore(1));
+h_Image = IsingPlot(grid,N,J,kT,M_store(1),energyStore(1));
 
 %-------------------------------------------------------------------------------
 % Evolve the Markov chain for numTimePoints iterations
@@ -87,15 +87,15 @@ for t = 1:numTimePoints
 
     % Refresh display of current spin configuration every N^2 trials
     if mod(t,everyT)==0
-        ClusterSizeStats(grid);
+        % ClusterSizeStats(grid);
         drawnow()
         % Sum up our variables of interest and plot:
-        % M = sum(grid(:))/numel(grid);
-        % E = IsingEnergy(grid,J);
-        % h_Image = IsingPlot(grid,N,J,kT,M,E,h_Image);
+        M = sum(grid(:))/numel(grid);
+        E = IsingEnergy(grid,J);
+        h_Image = IsingPlot(grid,N,J,kT,M,E,h_Image);
         % Store for later:
-        % energyStore(t/everyT) = E;
-        % M_store(t/everyT) = M;
+        energyStore(t/everyT) = E;
+        M_store(t/everyT) = M;
         % Pause if required:
         if timeLag > 0
             pause(timeLag)
