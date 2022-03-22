@@ -1,4 +1,4 @@
-function [grid,energyStore,M_store] = SampleGrid(grid,kT,J,numTimePoints,everyT,sampleHow,timeLag)
+function [grid,energyStore,M_store] = SampleGrid(grid,kT,J,numTimePoints,everyT,sampleHow,timeLag,saveVideo)
 % Sampling algorithms for the 2D Ising model
 %-------------------------------------------------------------------------------
 
@@ -10,6 +10,9 @@ if nargin < 6
 end
 if nargin < 7
     timeLag = 0;
+end
+if nargin < 8
+    saveVideo = true;
 end
 
 %-------------------------------------------------------------------------------
@@ -26,6 +29,12 @@ case {'HeatBath','Metropolis'}
     spin = randi(N^2,numTimePoints,1);
 case 'Wolff'
     p = 1 - exp(-2*J/kT);
+end
+
+%-------------------------------------------------------------------------------
+if saveVideo
+    v = VideoWriter('IsingSim.mp4','MPEG-4');
+    open(v);
 end
 
 %-------------------------------------------------------------------------------
@@ -98,7 +107,16 @@ for t = 1:numTimePoints
         if timeLag > 0
             pause(timeLag)
         end
+
+        if saveVideo
+            frame = getframe(f1);
+            writeVideo(v,frame);
+        end
     end
+end
+
+if saveVideo
+    close(v);
 end
 
 

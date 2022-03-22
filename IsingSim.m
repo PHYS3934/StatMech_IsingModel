@@ -26,7 +26,9 @@ case 'Wolff'
     everyT = N;
 end
 % timeLag
-timeLag = 0; % option to slow down plotting
+timeLag = 0; % option to pause after each round of updates—slows down plotting
+% saveVideo
+saveVideo = true;
 
 %-------------------------------------------------------------------------------
 % Generate a random initial configuration
@@ -42,7 +44,7 @@ end
 % Run the sampling algorithm
 %-------------------------------------------------------------------------------
 [finalGrid,energies,magnetizations] = ...
-            SampleGrid(grid,kT,J,numTimePoints,everyT,samplingMethod,timeLag);
+            SampleGrid(grid,kT,J,numTimePoints,everyT,samplingMethod,timeLag,saveVideo);
 
 %-------------------------------------------------------------------------------
 % Plotting:
