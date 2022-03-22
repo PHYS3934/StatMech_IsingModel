@@ -4,7 +4,7 @@
 % kT, rescaled temperature
 kT = 1;
 % N, linear lattice size
-N = 30;
+N = 50;
 % J, coupling strength (change sign for antiferromagnetic coupling!)
 J = 1;
 % reInitialize, whether to generate a new initial condition (or continue from previous)
@@ -12,11 +12,11 @@ reInitialize = true;
 % p, average proportion of initial +1 spins
 p = 0.5; % (0.5 for random initial condition)
 % samplingMethod, 'HeatBath', 'Metropolis' or 'Wolff'
-samplingMethod = 'Wolff';
+samplingMethod = 'Metropolis';
 switch samplingMethod
 case {'Metropolis','HeatBath'}
     % numTimePoints, number of update steps (use large multiple of N^2 for Metropolis)
-    numTimePoints = 20*N^2;
+    numTimePoints = 200*N^2;
     % everyT, plot and store the energy/magnetization of the grid everyT iterations
     everyT = N^2;
 case 'Wolff'
