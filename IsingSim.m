@@ -2,9 +2,10 @@
 % SET PARAMETERS
 %-------------------------------------------------------------------------------
 % kT, rescaled temperature
-kT = 1;
+% kT = 1;
+kT = 2/log(1+sqrt(2))*0.85;
 % N, linear lattice size
-N = 50;
+N = 100;
 % J, coupling strength (change sign for antiferromagnetic coupling!)
 J = 1;
 % reInitialize, whether to generate a new initial condition (or continue from previous)
@@ -21,14 +22,14 @@ case {'Metropolis','HeatBath'}
     everyT = N^2;
 case 'Wolff'
     % numTimePoints, number of update steps (use large multiple of N^2 for Metropolis)
-    numTimePoints = 20*N;
+    numTimePoints = 100*N;
     % everyT, plot and store the energy/magnetization of the grid everyT iterations
-    everyT = N;
+    everyT = 0.5*N;
 end
 % timeLag
-timeLag = 0; % option to pause after each round of updates—slows down plotting
+timeLag = 0; % (s) pause after each round of updates (slows down plotting)
 % saveVideo
-saveVideo = true;
+saveVideo = false; % saves result to file (as a video).
 
 %-------------------------------------------------------------------------------
 % Generate a random initial configuration

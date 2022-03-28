@@ -1,8 +1,8 @@
 % Parameters:
-N = 20; % grid size
+N = 100; % grid size
 J = 1;
-kT = 2.3;
-% kT = 2/log(1+sqrt(2)); % T_c
+% kT = 2.3;
+kT = 2/log(1+sqrt(2))*1.0; % T_c
 
 %-------------------------------------------------------------------------------
 grid0 = sign(0.5-rand(N)); % random initial configuration
