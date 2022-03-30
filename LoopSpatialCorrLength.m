@@ -8,13 +8,13 @@
 % SET PARAMETERS
 %-------------------------------------------------------------------------------
 % N, linear lattice size
-N = 100;
+N = 50;
 % J, coupling strength (change sign for antiferromagnetic coupling!)
 J = 1;
 % numTimePoints, number of update steps (use large multiple of N^2 for Metropolis)
 numTimePoints = 1000*N^2;
 % everyT, plot and store the energy/magnetization of the grid everyT iterations
-everyT = 100*N^2;
+everyT = 500*N^2;
 % reInitialize, whether to generate a new initial condition (or continue from previous)
 reInitialize = true;
 % p, average proportion of initial +1 spins
@@ -28,8 +28,9 @@ timeLag = 0; % option to slow down plotting
 % Run the sampling algorithm
 %-------------------------------------------------------------------------------
 kT = 2:0.02:2.5;
+% kT = 1:0.4:3;
 numkT = length(kT);
-numRepeats = 5;
+numRepeats = 3;
 lambda = zeros(numkT,numRepeats);
 for i = 1:numkT
     for r = 1:numRepeats
