@@ -2,10 +2,10 @@
 % SET PARAMETERS
 %-------------------------------------------------------------------------------
 % kT, rescaled temperature
-kTc = 2/log(1+sqrt(2));
+kTc = 2/log(1 + sqrt(2));
 kT = kTc*1.0;
 % N, linear lattice size
-N = 100;
+N = 400;
 % J, coupling strength (change sign for antiferromagnetic coupling!)
 J = 1;
 % reInitialize, whether to generate a new initial condition (or continue from previous)
@@ -18,12 +18,12 @@ samplingMethod = 'Metropolis';
 switch samplingMethod
 case 'Wolff'
     % numTimePoints, number of update steps (use large multiple of N^2 for Metropolis)
-    numTimePoints = 80*N;
+    numTimePoints = 800*N;
     % everyT, plot and store the energy/magnetization of the grid everyT iterations
     everyT = N;
 case 'Metropolis'
     % numTimePoints, number of update steps (use large multiple of N^2 for Metropolis)
-    numTimePoints = 200*N^2;
+    numTimePoints = 500*N^2;
     % everyT, plot and store the energy/magnetization of the grid everyT iterations
     everyT = 10*N^2;
 end
@@ -48,7 +48,7 @@ finalGrid = SampleGrid(grid,kT,J,numTimePoints,everyT,samplingMethod,timeLag);
 %-------------------------------------------------------------------------------
 % Plotting:
 %-------------------------------------------------------------------------------
-% clusterAreas = ClusterSizeStats(finalGrid);
+clusterAreas = ClusterSizeStats(finalGrid);
 
 %------Plot spin-spin correlations------
 % f2 = figure(2);

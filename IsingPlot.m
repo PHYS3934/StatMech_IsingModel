@@ -30,6 +30,6 @@ end
 
 xlabel(sprintf('J = %0.2f, kT = %0.2f, M = %0.3f, E = %0.3f',...
                 J,kT,M,E));
-drawnow;
+drawnow();
 
 end
