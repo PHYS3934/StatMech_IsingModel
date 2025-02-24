@@ -1,0 +1,8 @@
+numpy
+scipy
+matplotlib
+pandas
+ipympl
+ipython
+ipywidgets
+mplcursors
