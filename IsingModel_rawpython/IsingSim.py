@@ -5,7 +5,7 @@ from scipy import signal
 import mplcursors
 from matplotlib.animation import FuncAnimation
 import matplotlib
-matplotlib.use("TkAgg") 
+matplotlib.use("TkAgg")
 
 # Import necessary functions:
 from IsingEnergy import IsingEnergy
@@ -16,7 +16,7 @@ from CorrelationFun import CorrelationFun
 # Parameters
 N = 100  # grid size
 J = 1
-kT = 2/np.log(1+np.sqrt(2))*0.85  # Below critical temperature
+kT = 2/np.log(1 + np.sqrt(2))*0.85  # Below critical temperature
 
 # Sampling parameters
 reInitialize = True
@@ -28,7 +28,7 @@ if samplingMethod in ['Metropolis', 'HeatBath']:
     numTimePoints = 100*N**2
     everyT = N**2
 elif samplingMethod == 'Wolff':
-    numTimePoints = 100*N 
+    numTimePoints = 100*N
     everyT = int(0.5*N)
 
 # Generate initial configuration
@@ -51,7 +51,6 @@ time_text = ax.text(0.5, 0, '', transform=ax.transAxes, ha='center', fontsize=12
 
 
 def update(i):
-
     im.set_array(grid_history[i])
     M = np.sum(grid_history[i]) / grid_history[i].size
     E = IsingEnergy(grid_history[i], J)
@@ -61,7 +60,7 @@ def update(i):
     return im, time_text
 
 # Create animation
-ani = FuncAnimation(fig, update, frames=len(grid_history), 
+ani = FuncAnimation(fig, update, frames=len(grid_history),
                     interval=200, blit=True, repeat=False) # Change speed by varying "interval"
 
 
@@ -70,12 +69,12 @@ ani = FuncAnimation(fig, update, frames=len(grid_history),
 ### Correlation Matrix ###
 
 fig = plt.figure(figsize=(10, 7))
-plt.subplots_adjust(wspace=0.4)  
+plt.subplots_adjust(wspace=0.4)
 
 ax1 = fig.add_subplot(121, projection="3d")
-ax2 = fig.add_subplot(122) 
+ax2 = fig.add_subplot(122)
 
-# Calculate correlation matrix 
+# Calculate correlation matrix
 corrMatrix = CorrelationFun(finalGrid)
 
 # Create meshgrid
@@ -91,14 +90,14 @@ ax1.set_zlabel('Corr')
 ax1.set_title('Correlation', fontweight='bold')
 
 # Plot radial average
-R = RadialAverage(corrMatrix, N) 
+R = RadialAverage(corrMatrix, N)
 ax2.plot(R)
 ax2.set_xlabel('Distance')
 ax2.set_ylabel('Correlation')
 ax2.set_title('Radial average', fontweight='bold')
 
 # Add cursor to click over line plot and get coordinate info
-cursor = mplcursors.cursor(ax2.get_lines(), hover=False)  
+cursor = mplcursors.cursor(ax2.get_lines(), hover=False)
 
 
 
@@ -108,8 +107,8 @@ cursor = mplcursors.cursor(ax2.get_lines(), hover=False)
 fig, axes = plt.subplots(2, 2, figsize=(10, 8))
 plt.subplots_adjust(wspace=0.3)
 
-ax_en, ax_en_hist = axes[0]  
-ax_mag, ax_mag_hist = axes[1]    
+ax_en, ax_en_hist = axes[0]
+ax_mag, ax_mag_hist = axes[1]
 
 custom_blue = (0, 0.4470, 0.7410)
 
@@ -134,7 +133,7 @@ ax_mag_hist.set_xlabel('magnetization')
 ax_mag_hist.set_ylabel('frequency')
 
 # Enable cursors upon clicking on a point:
-cursor = mplcursors.cursor(ax_en.get_lines(), hover=False)  
-cursor = mplcursors.cursor(ax_mag.get_lines(), hover=False) 
+cursor = mplcursors.cursor(ax_en.get_lines(), hover=False)
+cursor = mplcursors.cursor(ax_mag.get_lines(), hover=False)
 
 plt.show()

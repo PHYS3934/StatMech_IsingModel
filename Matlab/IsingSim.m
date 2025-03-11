@@ -51,48 +51,48 @@ end
 % Plotting:
 %-------------------------------------------------------------------------------
 
-%------Plot spin-spin correlations------
-f2 = figure(2);
-f2.Color = 'w';
+% %------Plot spin-spin correlations------
+% f2 = figure(2);
+% f2.Color = 'w';
 
-% Plot spin-spin correlation function
-subplot(121)
-corrMatrix = CorrelationFun(finalGrid);
-[X,Y] = meshgrid(-N/2:(N/2-1),-N/2:(N/2-1));
-surf(X,Y,corrMatrix);
-title('Correlation')
-xlabel('x')
-ylabel('y')
-zlabel('Corr')
-colormap('hot')
-caxis([0,min(0.3,max(corrMatrix(:)))])
+% % Plot spin-spin correlation function
+% subplot(121)
+% corrMatrix = CorrelationFun(finalGrid);
+% [X,Y] = meshgrid(-N/2:(N/2-1),-N/2:(N/2-1));
+% surf(X,Y,corrMatrix);
+% title('Correlation')
+% xlabel('x')
+% ylabel('y')
+% zlabel('Corr')
+% colormap('hot')
+% caxis([0,min(0.3,max(corrMatrix(:)))])
 
-% Plot the radial average of spin-spin correlation function
-subplot(122)
-R = RadialAverage(corrMatrix,N);
-plot(R);
-xlabel('Distance')
-ylabel('Correlation')
-title('Radial average')
+% % Plot the radial average of spin-spin correlation function
+% subplot(122)
+% R = RadialAverage(corrMatrix,N);
+% plot(R);
+% xlabel('Distance')
+% ylabel('Correlation')
+% title('Radial average')
 
-%------Plot energy/magnetization variation across Markov chain evolution------
-if exist('energies','var')
-    f3 = figure(3);
-    f3.Color = 'w';
-    subplot(221)
-    plot(energies)
-    xlabel(sprintf('time (iterations/%u)',everyT));
-    ylabel('energy')
-    subplot(222)
-    histogram(energies)
-    xlabel('energy');
-    ylabel('frequency')
-    subplot(223)
-    plot(magnetizations)
-    xlabel(sprintf('time (iterations/%u)',everyT));
-    ylabel('magnetization')
-    subplot(224)
-    histogram(magnetizations)
-    xlabel('magnetization');
-    ylabel('frequency')
-end
+% %------Plot energy/magnetization variation across Markov chain evolution------
+% if exist('energies','var')
+%     f3 = figure(3);
+%     f3.Color = 'w';
+%     subplot(221)
+%     plot(energies)
+%     xlabel(sprintf('time (iterations/%u)',everyT));
+%     ylabel('energy')
+%     subplot(222)
+%     histogram(energies)
+%     xlabel('energy');
+%     ylabel('frequency')
+%     subplot(223)
+%     plot(magnetizations)
+%     xlabel(sprintf('time (iterations/%u)',everyT));
+%     ylabel('magnetization')
+%     subplot(224)
+%     histogram(magnetizations)
+%     xlabel('magnetization');
+%     ylabel('frequency')
+% end
