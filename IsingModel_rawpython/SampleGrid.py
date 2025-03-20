@@ -1,9 +1,12 @@
 # Import libraries:
 import numpy as np
+from tqdm import tqdm
 
 # Import necessary functions:
 from myNeighbors import myNeighbors
 from IsingEnergy import IsingEnergy
+from WolffIteration import WolffIteration
+
 
 def SampleGrid(grid, kT, J, numTimePoints, everyT, sampleHow="Metropolis", timeLag=0, saveVideo=False):
     """
@@ -14,14 +17,15 @@ def SampleGrid(grid, kT, J, numTimePoints, everyT, sampleHow="Metropolis", timeL
     grid_history = []  # Store grid states for animation
     
     # Precompute the indices adjacent to each spin index
-    adj = myNeighbors(range(1, N**2+1), N)
+    adj = myNeighbors(range(0, N**2), N)
     
     # Initialize based on sampling method
     if sampleHow in ["HeatBath", "Metropolis"]:
         # Precompute a sequence of random spins (with a linear index)
-        spin = np.random.randint(1, N**2+1, numTimePoints)
+        spin = np.random.randint(0, N**2, numTimePoints)
     elif sampleHow == "Wolff":
         p = 1 - np.exp(-2*J/kT)
+        spin = None  # We don't need spin for Wolff algorithm
     
     # Store for observables
     num_samples = numTimePoints // everyT + 1  # +1 for initial state
@@ -34,26 +38,26 @@ def SampleGrid(grid, kT, J, numTimePoints, everyT, sampleHow="Metropolis", timeL
     grid_history.append(grid.copy())
     
     # Define update function for a single step
-    def update_step(grid, t, spin=None, sampleHow=sampleHow):
+    def update_step(grid, t, spin_idx=None):
         if sampleHow == "HeatBath":
             # Index, s, of the spin to consider flipping:
-            s = spin[t-1]
+            s = spin_idx
             # Calculate the difference in energy between s up/down
-            pUp = J * np.sum(grid.flat[adj[s-1]-1])
+            pUp = J * np.sum(grid.flat[adj[s-1]])
             pDown = -pUp
             z = np.exp(-pUp/kT) + np.exp(-pDown/kT)
             p = np.exp(-pUp/kT) / z
             # Decide whether to set this spin up or down:
             if np.random.random() <= p:
-                grid.flat[s-1] = -1
+                grid.flat[s] = -1
             else:
-                grid.flat[s-1] = 1
+                grid.flat[s] = 1
                 
         elif sampleHow == "Metropolis":
             # Index, s, of the spin to consider flipping:
-            s = spin[t-1]
+            s = spin_idx
             # Compute the change in energy from flipping this spin:
-            deltaE = 2 * J * grid.flat[s-1] * np.sum(grid.flat[adj[s-1]-1])
+            deltaE = 2 * J * grid.flat[s-1] * np.sum(grid.flat[adj[s-1]])
             if deltaE < 0:
                 # Always flip to lower energy
                 grid.flat[s-1] = -grid.flat[s-1]
@@ -68,17 +72,18 @@ def SampleGrid(grid, kT, J, numTimePoints, everyT, sampleHow="Metropolis", timeL
             # Identify a cluster to flip using the Wolff algorithm
             p_wolff = 1 - np.exp(-2*J/kT)
             C, _ = WolffIteration(N, p_wolff, grid, adj)
-            # Convert to 0-indexed for numpy array indexing
-            C_idx = [c-1 for c in C]
-            # Flip the cluster
-            grid.flat[C_idx] = -grid.flat[C_idx]
+            grid.flat[C] = -grid.flat[C]
+
             
         return grid
     
     # Run the simulation
-    for t in range(1, numTimePoints+1):
-        # Update the grid
-        grid = update_step(grid, t, spin)
+    for t in tqdm(range(1, numTimePoints+1)):
+        # Update the grid based on sampling method
+        if sampleHow in ["HeatBath", "Metropolis"]:
+            grid = update_step(grid, t, spin[t-1])
+        elif sampleHow == "Wolff":
+            grid = update_step(grid, t, None)
         
         # Store grid and observables at specified intervals
         if t % everyT == 0:
