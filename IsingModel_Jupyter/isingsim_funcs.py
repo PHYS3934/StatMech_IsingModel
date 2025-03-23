@@ -105,7 +105,7 @@ def SampleGrid(grid, kT, J, numTimePoints, everyT, sampleHow="Metropolis", timeL
         spin = None  # We don't need spin for Wolff algorithm
     
     # Store for observables
-    num_samples = numTimePoints // everyT + 1  # +1 for initial state
+    num_samples = numTimePoints // everyT 
     M_store = np.zeros(num_samples)
     energyStore = np.zeros(num_samples)
     
@@ -120,7 +120,7 @@ def SampleGrid(grid, kT, J, numTimePoints, everyT, sampleHow="Metropolis", timeL
             # Index, s, of the spin to consider flipping:
             s = spin_idx
             # Calculate the difference in energy between s up/down
-            pUp = J * np.sum(grid.flat[adj[s-1]])
+            pUp = J * np.sum(grid.flat[adj[s]])
             pDown = -pUp
             z = np.exp(-pUp/kT) + np.exp(-pDown/kT)
             p = np.exp(-pUp/kT) / z
@@ -134,16 +134,16 @@ def SampleGrid(grid, kT, J, numTimePoints, everyT, sampleHow="Metropolis", timeL
             # Index, s, of the spin to consider flipping:
             s = spin_idx
             # Compute the change in energy from flipping this spin:
-            deltaE = 2 * J * grid.flat[s-1] * np.sum(grid.flat[adj[s-1]])
+            deltaE = 2 * J * grid.flat[s] * np.sum(grid.flat[adj[s]])
             if deltaE < 0:
                 # Always flip to lower energy
-                grid.flat[s-1] = -grid.flat[s-1]
+                grid.flat[s] = -grid.flat[s]
             else:
                 # Calculate the transition probability
                 p = np.exp(-deltaE/kT)
                 # A transition to higher energy occurs with probability p:
                 if np.random.random() <= p:
-                    grid.flat[s-1] = -grid.flat[s-1]
+                    grid.flat[s] = -grid.flat[s]
         
         elif sampleHow == "Wolff":
             # Identify a cluster to flip using the Wolff algorithm
@@ -155,10 +155,10 @@ def SampleGrid(grid, kT, J, numTimePoints, everyT, sampleHow="Metropolis", timeL
         return grid
     
     # Run the simulation
-    for t in tqdm(range(1, numTimePoints+1)):
+    for t in tqdm(range(0, numTimePoints)):
         # Update the grid based on sampling method
         if sampleHow in ["HeatBath", "Metropolis"]:
-            grid = update_step(grid, t, spin[t-1])
+            grid = update_step(grid, t, spin[t])
         elif sampleHow == "Wolff":
             grid = update_step(grid, t, None)
         
