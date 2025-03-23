@@ -13,7 +13,7 @@ reInitialize = true;
 % p, average proportion of initial +1 spins
 p = 0.5; % (0.5 for random initial condition)
 % samplingMethod, 'HeatBath', 'Metropolis' or 'Wolff'
-samplingMethod = 'Metropolis';
+samplingMethod = 'HeatBath';
 switch samplingMethod
 case {'Metropolis','HeatBath'}
     % numTimePoints, number of update steps (use large multiple of N^2 for Metropolis)

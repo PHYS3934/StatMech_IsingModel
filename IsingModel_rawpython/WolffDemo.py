@@ -158,11 +158,11 @@ class WolffDemo:
         if self.state == 'initial':
             # Get cluster update
             self.C, self.seed = WolffIteration(self.N, self.p, self.grid, self.adj)
-            self.theNewSpin = -self.grid[np.unravel_index(self.seed-1, (self.N,self.N))]
+            self.theNewSpin = -self.grid[np.unravel_index(self.seed, (self.N,self.N))]
             
             # Show seed
             self.grid_display = np.where(self.grid == -1, 0, 1)
-            self.grid_display[np.unravel_index(self.seed-1, (self.N,self.N))] = 2
+            self.grid_display[np.unravel_index(self.seed, (self.N,self.N))] = 2
             self.status_label.configure(text='Seed Selected')
             self.state = 'seed'
             
@@ -170,15 +170,15 @@ class WolffDemo:
             # Show cluster
             self.grid_display = np.where(self.grid == -1, 0, 1)
             for c in self.C:
-                self.grid_display[np.unravel_index(c-1, (self.N,self.N))] = 3
-            self.grid_display[np.unravel_index(self.seed-1, (self.N,self.N))] = 2
+                self.grid_display[np.unravel_index(c, (self.N,self.N))] = 3
+            self.grid_display[np.unravel_index(self.seed, (self.N,self.N))] = 2
             self.status_label.configure(text='Cluster Found')
             self.state = 'cluster'
             
         elif self.state == 'cluster':
             # Update spins
             for c in self.C:
-                self.grid[np.unravel_index(c-1, (self.N,self.N))] = self.theNewSpin
+                self.grid[np.unravel_index(c, (self.N,self.N))] = self.theNewSpin
             self.grid_display = np.where(self.grid == -1, 0, 1)
             
             # Update correlation
