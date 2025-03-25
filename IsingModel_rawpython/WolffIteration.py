@@ -2,40 +2,46 @@ import numpy as np
 
 def WolffIteration(N, p, grid, adj):
     """
-    Find a cluster, C, according the the Wolff sampling rule
+    Find a cluster according to the Wolff sampling rule - MATLAB-like implementation
     """
-    # Random seed spin
+    import numpy as np
+    
+    # Random seed spin (0-indexed for Python)
     i = np.random.randint(0, N**2)
     
-    # The cluster and frontier initialization
+    # The cluster (initialized with seed)
     C = [i]
+    
+    # The frontier of spins
     F = [i]
-    s = grid.flat[i]  # seed spin direction
     
-    # Indicator arrays to track cluster membership
-    Ci = np.zeros(N**2, dtype=bool)
-    Ci[i] = True
+    # Seed spin direction
+    s = grid.flat[i]
     
-    while F:
-        # Get all neighbors of frontier spins
-        neighbors = adj[F].flatten()
-        
-        # Only choose spins parallel to the seed spin
-        neighbors = [n for n in neighbors if grid.flat[n-1] == s]
-        
-        # Find elements not already in the cluster
-        Fi = np.zeros(N**2, dtype=bool)
-        Fi[np.array(neighbors)-1] = True  # Adjust for 0-indexing
-        new_spins = np.where(Fi & ~Ci)[0]
-        
-        # Keep spins only with probability p
-        F = []
-        for spin in new_spins:
-            if np.random.random() < p:
-                F.append(spin)
-                C.append(spin)
-                Ci[spin] = True
+    # Indicator function for cluster elements
+    Ci = np.zeros(N**2, dtype=int)
     
-    # Convert from 0-indexed to 1-indexed for consistency with MATLAB
-    C = [c+1 for c in C]
-    return C, i+1
+    while len(F) > 0:
+        # Get all neighbors of all frontier spins (vectorized)
+        neighbors = adj[F].reshape(-1)  # Flattened array of all neighbors
+        
+        # Only choose neighbors parallel to the seed spin (vectorized)
+        parallel_mask = [grid.flat[n] == s for n in neighbors]
+        F = neighbors[parallel_mask]
+        
+        # Find elements that aren't in the cluster (using indicator arrays)
+        Ci[C] = 1
+        Fi = np.zeros(N**2, dtype=int)
+        Fi[F] = 1
+        
+        # Elements in frontier but not in cluster
+        F = np.where(Fi - Ci > 0)[0]
+        
+        # Apply probability filter (vectorized)
+        r = np.random.random(len(F))
+        F = F[r < p]
+        
+        # Add to cluster (vectorized)
+        C.extend(F)
+    
+    return C, i
