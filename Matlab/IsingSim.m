@@ -36,7 +36,7 @@ saveVideo = false; % saves result to file (as a video).
 %-------------------------------------------------------------------------------
 % Comment out to keep sampling with the previous configuration.
 if reInitialize
-    grid = sign(p-rand(N)); % random initial configuration
+    grid = sign(p - rand(N)); % random initial configuration
 else
     grid = finalGrid; % from last time
 end
