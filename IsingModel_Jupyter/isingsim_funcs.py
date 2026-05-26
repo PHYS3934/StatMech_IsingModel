@@ -2,8 +2,8 @@
 
 # Import necessary libraries
 import numpy as np
-from scipy import signal    
-import matplotlib.pyplot as plt 
+from scipy import ndimage, signal
+import matplotlib.pyplot as plt
 from tqdm import tqdm
 
 def IsingEnergy(grid, J):
@@ -36,7 +36,7 @@ def myNeighbors(s, N):
     adj[:, 1] = np.mod(r - 1, N) * N + c     # up
     adj[:, 2] = r * N + np.mod(c + 1, N)     # right
     adj[:, 3] = r * N + np.mod(c - 1, N)     # left
-    
+
     return adj
 
 def WolffIteration(N, p, grid, adj):
@@ -44,45 +44,45 @@ def WolffIteration(N, p, grid, adj):
     Find a cluster according to the Wolff sampling rule - MATLAB-like implementation
     """
     import numpy as np
-    
+
     # Random seed spin (0-indexed for Python)
     i = np.random.randint(0, N**2)
-    
+
     # The cluster (initialized with seed)
     C = [i]
-    
+
     # The frontier of spins
     F = [i]
-    
+
     # Seed spin direction
     s = grid.flat[i]
-    
+
     # Indicator function for cluster elements
     Ci = np.zeros(N**2, dtype=int)
-    
+
     while len(F) > 0:
         # Get all neighbors of all frontier spins (vectorized)
         neighbors = adj[F].reshape(-1)  # Flattened array of all neighbors
-        
+
         # Only choose neighbors parallel to the seed spin (vectorized)
         parallel_mask = [grid.flat[n] == s for n in neighbors]
         F = neighbors[parallel_mask]
-        
+
         # Find elements that aren't in the cluster (using indicator arrays)
         Ci[C] = 1
         Fi = np.zeros(N**2, dtype=int)
         Fi[F] = 1
-        
+
         # Elements in frontier but not in cluster
         F = np.where(Fi - Ci > 0)[0]
-        
+
         # Apply probability filter (vectorized)
         r = np.random.random(len(F))
         F = F[r < p]
-        
+
         # Add to cluster (vectorized)
         C.extend(F)
-    
+
     return C, i
 
 def SampleGrid(grid, kT, J, numTimePoints, everyT, sampleHow="Metropolis", timeLag=0, saveVideo=False):
@@ -95,7 +95,7 @@ def SampleGrid(grid, kT, J, numTimePoints, everyT, sampleHow="Metropolis", timeL
 
     # Precompute the indices adjacent to each spin index
     adj = myNeighbors(range(0, N**2), N)
-    
+
     # Initialize based on sampling method
     if sampleHow in ["HeatBath", "Metropolis"]:
         # Precompute a sequence of random spins (with a linear index)
@@ -103,9 +103,9 @@ def SampleGrid(grid, kT, J, numTimePoints, everyT, sampleHow="Metropolis", timeL
     elif sampleHow == "Wolff":
         p = 1 - np.exp(-2*J/kT)
         spin = None  # We don't need spin for Wolff algorithm
-    
+
     # Store for observables
-    num_samples = numTimePoints // everyT 
+    num_samples = numTimePoints // everyT
     M_store = np.zeros(num_samples)
     energyStore = np.zeros(num_samples)
 
@@ -129,7 +129,7 @@ def SampleGrid(grid, kT, J, numTimePoints, everyT, sampleHow="Metropolis", timeL
                 grid.flat[s] = -1
             else:
                 grid.flat[s] = 1
-                
+
         elif sampleHow == "Metropolis":
             # Index, s, of the spin to consider flipping:
             s = spin_idx
@@ -144,14 +144,14 @@ def SampleGrid(grid, kT, J, numTimePoints, everyT, sampleHow="Metropolis", timeL
                 # A transition to higher energy occurs with probability p:
                 if np.random.random() <= p:
                     grid.flat[s] = -grid.flat[s]
-        
+
         elif sampleHow == "Wolff":
             # Identify a cluster to flip using the Wolff algorithm
             p_wolff = 1 - np.exp(-2*J/kT)
             C, _ = WolffIteration(N, p_wolff, grid, adj)
             grid.flat[C] = -grid.flat[C]
 
-            
+
         return grid
 
     # Run the simulation
@@ -161,7 +161,7 @@ def SampleGrid(grid, kT, J, numTimePoints, everyT, sampleHow="Metropolis", timeL
             grid = update_step(grid, t, spin[t])
         elif sampleHow == "Wolff":
             grid = update_step(grid, t, None)
-        
+
         # Store grid and observables at specified intervals
         if t % everyT == 0:
             idx = t // everyT
@@ -227,3 +227,117 @@ def RadialAverage(cor, N):
 
     return R
 
+
+def _sample_ising_grid(size=200, sweeps=250, kT=None, J=1, seed=0):
+    """
+    Generate a representative Ising grid for running this module as a script.
+    """
+    if kT is None:
+        kT = 2 / np.log(1 + np.sqrt(2))
+
+    rng = np.random.default_rng(seed)
+    grid = rng.choice([-1, 1], size=(size, size))
+    checkerboard = np.indices(grid.shape).sum(axis=0) % 2
+
+    for _ in range(sweeps):
+        for parity in (0, 1):
+            neighbor_sum = (
+                np.roll(grid, 1, axis=0)
+                + np.roll(grid, -1, axis=0)
+                + np.roll(grid, 1, axis=1)
+                + np.roll(grid, -1, axis=1)
+            )
+            p_up = 1 / (1 + np.exp(-2 * J * neighbor_sum / kT))
+            update = checkerboard == parity
+            grid[update] = np.where(rng.random(np.sum(update)) < p_up[update], 1, -1)
+
+    return grid
+
+
+def ClusterSizeStats(grid):
+    """
+    Get statistics on cluster sizes
+    -------------------------------------------------------------------------------
+    """
+    # Get connected components for positive values
+    CC1, num_features_pos = ndimage.label(grid > 0)
+    # Get area of each labeled region
+    unique_pos, SS1 = np.unique(CC1[CC1 > 0], return_counts=True)
+
+    # Get connected components for negative values
+    CC2, num_features_neg = ndimage.label(grid < 0)
+    # Get area of each labeled region
+    unique_neg, SS2 = np.unique(CC2[CC2 > 0], return_counts=True)
+
+    # Combine cluster areas
+    clusterSizes = np.concatenate([SS1, SS2])
+    if len(clusterSizes) == 0:
+        raise ValueError("ClusterSizeStats requires a grid with positive or negative spins.")
+
+    # -------------------------------------------------------------------------------
+    # Logarithmic binning
+    # -------------------------------------------------------------------------------
+    numBins = min(len(np.unique(clusterSizes))//5, 12)
+    numBins = max(numBins, 2)  # np.histogram needs at least two bin edges
+
+    # log10-spaced bin edges:
+    binEdges = np.logspace(np.log10(min(clusterSizes)*0.9999),
+                          np.log10(max(clusterSizes)*1.0001),
+                          numBins)
+
+    # Bin the data using custom bin edges:
+    N, binEdges = np.histogram(clusterSizes, bins=binEdges)
+
+    # Bin centers as middle points between bin edges:
+    binCenters = (binEdges[1:] + binEdges[:-1]) / 2
+
+    # Convert counts to probabilities:
+    Nnorm = N / np.sum(N)
+
+    # -------------------------------------------------------------------------------
+    # PLOTTING
+    # -------------------------------------------------------------------------------
+    plt.figure(figsize=(15, 5))
+
+    plt.subplot(1, 3, 1)
+    plt.imshow(grid, cmap='binary')
+    plt.axis('image')
+
+    plt.subplot(1, 3, 2)
+    # Create colored labels for visualization
+    L1 = CC1
+    L2 = CC2
+
+    # Color the positive clusters using 'jet' colormap
+    RGB1 = np.zeros((*L1.shape, 3))
+    for i in range(1, num_features_pos + 1):
+        RGB1[L1 == i] = plt.cm.jet(i / num_features_pos)[:3]
+
+    # Color the negative clusters using a different colormap
+    lines = plt.get_cmap('tab20')
+    RGB2 = np.zeros((*L2.shape, 3))
+    for i in range(1, num_features_neg + 1):
+        RGB2[L2 == i] = lines(i / num_features_neg)[:3]
+
+    # Combine the two images
+    plt.imshow(RGB1 + RGB2)
+    plt.axis('image')
+
+    plt.subplot(1, 3, 3)
+    plt.loglog(binCenters, Nnorm, 'o-k')
+    plt.xlabel('Cluster size')
+    plt.ylabel('Probability')
+
+    plt.tight_layout()
+    plt.show()
+
+    return clusterSizes
+
+
+# def main():
+#     grid = _sample_ising_grid()
+#     ClusterSizeStats(grid)
+
+
+# if __name__ == "__main__":
+#     main()
