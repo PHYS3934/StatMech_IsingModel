@@ -11,8 +11,8 @@ matplotlib.use('TkAgg')
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 # Import neceesary functions:
-from myNeighbors import myNeighbors
-from WolffIteration import WolffIteration
+from IsingModel_rawpython.myNeighbors import myNeighbors
+from IsingModel_rawpython.WolffIteration import WolffIteration
 
 class WolffDemo:
     def __init__(self, N=100):

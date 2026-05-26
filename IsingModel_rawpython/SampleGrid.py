@@ -3,9 +3,9 @@ import numpy as np
 from tqdm import tqdm
 
 # Import necessary functions:
-from myNeighbors import myNeighbors
-from IsingEnergy import IsingEnergy
-from WolffIteration import WolffIteration
+from IsingModel_rawpython.myNeighbors import myNeighbors
+from IsingModel_rawpython.IsingEnergy import IsingEnergy
+from IsingModel_rawpython.WolffIteration import WolffIteration
 
 
 def SampleGrid(grid, kT, J, numTimePoints, everyT, sampleHow="Metropolis", timeLag=0, saveVideo=False):

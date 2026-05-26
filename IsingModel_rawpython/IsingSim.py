@@ -8,10 +8,10 @@ import matplotlib
 matplotlib.use("TkAgg")
 
 # Import necessary functions:
-from IsingEnergy import IsingEnergy
-from SampleGrid import SampleGrid
-from RadialAverage import RadialAverage
-from CorrelationFun import CorrelationFun
+from IsingModel_rawpython.IsingEnergy import IsingEnergy
+from IsingModel_rawpython.SampleGrid import SampleGrid
+from IsingModel_rawpython.RadialAverage import RadialAverage
+from IsingModel_rawpython.CorrelationFun import CorrelationFun
 
 # Parameters
 N = 100  # grid size
