@@ -8,6 +8,28 @@ from IsingModel_rawpython.IsingEnergy import IsingEnergy
 from IsingModel_rawpython.WolffIteration import WolffIteration
 
 
+def _checkerboard_update(grid, kT, J, sampleHow, update_masks):
+    for update in update_masks:
+        neighbor_sum = (
+            np.roll(grid, 1, axis=0)
+            + np.roll(grid, -1, axis=0)
+            + np.roll(grid, 1, axis=1)
+            + np.roll(grid, -1, axis=1)
+        )
+
+        if sampleHow == "HeatBath":
+            p_up = 1 / (1 + np.exp(-2 * J * neighbor_sum[update] / kT))
+            grid[update] = np.where(np.random.random(np.sum(update)) < p_up, 1, -1)
+        elif sampleHow == "Metropolis":
+            spins = grid[update]
+            deltaE = 2 * J * spins * neighbor_sum[update]
+            flips = (deltaE < 0) | (np.random.random(len(deltaE)) < np.exp(-deltaE / kT))
+            spins[flips] = -spins[flips]
+            grid[update] = spins
+
+    return grid
+
+
 def SampleGrid(grid, kT, J, numTimePoints, everyT, sampleHow="Metropolis", timeLag=0, saveVideo=False):
     """
     Sampling algorithms for the 2D Ising model
@@ -15,6 +37,41 @@ def SampleGrid(grid, kT, J, numTimePoints, everyT, sampleHow="Metropolis", timeL
     """
     N = grid.shape[0]
     grid_history = []  # Store grid states for animation
+
+    def store_sample(idx):
+        M_store[idx] = np.sum(grid) / grid.size
+        energyStore[idx] = IsingEnergy(grid, J)
+        grid_history.append(grid.copy())
+
+    sweep_size = N**2
+    can_use_sweeps = (
+        sampleHow in ["HeatBath", "Metropolis"]
+        and numTimePoints % sweep_size == 0
+        and everyT % sweep_size == 0
+    )
+
+    if can_use_sweeps:
+        num_sweeps = numTimePoints // sweep_size
+        sample_every_sweeps = everyT // sweep_size
+        num_samples = num_sweeps // sample_every_sweeps + 1
+        M_store = np.zeros(num_samples)
+        energyStore = np.zeros(num_samples)
+        store_sample(0)
+
+        checkerboard = np.indices(grid.shape).sum(axis=0) % 2
+        update_masks = [checkerboard == 0, checkerboard == 1]
+
+        sample_idx = 1
+        for sweep in tqdm(range(1, num_sweeps + 1)):
+            grid = _checkerboard_update(grid, kT, J, sampleHow, update_masks)
+            if sweep % sample_every_sweeps == 0:
+                store_sample(sample_idx)
+                sample_idx += 1
+
+        def animate_func(i):
+            return grid_history[i]
+
+        return grid, energyStore, M_store, grid_history, animate_func
     
     # Precompute the indices adjacent to each spin index
     adj = myNeighbors(range(0, N**2), N)
@@ -28,14 +85,12 @@ def SampleGrid(grid, kT, J, numTimePoints, everyT, sampleHow="Metropolis", timeL
         spin = None  # We don't need spin for Wolff algorithm
     
     # Store for observables
-    num_samples = numTimePoints // everyT 
+    num_samples = numTimePoints // everyT + 1
     M_store = np.zeros(num_samples)
     energyStore = np.zeros(num_samples)
     
     # Calculate initial values
-    M_store[0] = np.sum(grid) / grid.size
-    energyStore[0] = IsingEnergy(grid, J)
-    grid_history.append(grid.copy())
+    store_sample(0)
     
     # Define update function for a single step
     def update_step(grid, t, spin_idx=None):
@@ -78,6 +133,7 @@ def SampleGrid(grid, kT, J, numTimePoints, everyT, sampleHow="Metropolis", timeL
         return grid
     
     # Run the simulation
+    sample_idx = 1
     for t in tqdm(range(0, numTimePoints)):
         # Update the grid based on sampling method
         if sampleHow in ["HeatBath", "Metropolis"]:
@@ -86,16 +142,9 @@ def SampleGrid(grid, kT, J, numTimePoints, everyT, sampleHow="Metropolis", timeL
             grid = update_step(grid, t, None)
         
         # Store grid and observables at specified intervals
-        if t % everyT == 0:
-            idx = t // everyT
-            # Calculate observables
-            M = np.sum(grid) / grid.size
-            E = IsingEnergy(grid, J)
-            
-            # Store values
-            M_store[idx] = M
-            energyStore[idx] = E
-            grid_history.append(grid.copy())
+        if (t + 1) % everyT == 0:
+            store_sample(sample_idx)
+            sample_idx += 1
     
     # Define animation update function
     def animate_func(i):
