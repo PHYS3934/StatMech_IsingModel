@@ -1,3 +1,6 @@
 .DS_Store
 __pycache__/
-*.cpython-313.pyc
+*.pyc
+.ipynb_checkpoints/
+*.gif
+*.mp4

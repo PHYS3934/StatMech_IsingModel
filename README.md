@@ -47,10 +47,10 @@ On Windows, the main differences are the virtual-environment activation command 
 
 Use these for teaching and interactive exploration:
 
-- `ising-model-jupyter/IsingSim.ipynb`: main simulation notebook
-- `ising-model-jupyter/WolffDemo.ipynb`: interactive Wolff cluster update demo
-- `ising-model-jupyter/isingsim_funcs.py`: helper functions used by `IsingSim.ipynb`
-- `ising-model-jupyter/wolffdemo_funcs.py`: helper functions used by `WolffDemo.ipynb`
+- `jupyter/IsingSim.ipynb`: main simulation notebook
+- `jupyter/WolffDemo.ipynb`: interactive Wolff cluster update demo
+- `jupyter/isingsim_funcs.py`: helper functions used by `IsingSim.ipynb`
+- `jupyter/wolffdemo_funcs.py`: helper functions used by `WolffDemo.ipynb`
 
 The main notebook keeps the important inputs near the top:
 
@@ -68,12 +68,12 @@ samplingMethod = "HeatBath"
 Run scripts from the repo root:
 
 ```bash
-python ising-model-python/IsingSim.py
-python ising-model-python/WolffDemo.py
-python ising-model-python/ClusterSizeStats.py
+python python/IsingSim.py
+python python/WolffDemo.py
+python python/ClusterSizeStats.py
 ```
 
-The raw Python modules are in `ising-model-python/`:
+The raw Python modules are in `python/`:
 
 - `IsingSim.py`: runs a full simulation and plots animation, correlations, energy, and magnetization
 - `SampleGrid.py`: implements Heat Bath, Metropolis, and Wolff sampling
@@ -85,7 +85,7 @@ Some standalone plots use Matplotlib's Tk backend. If a GUI window does not open
 
 ## MATLAB
 
-The MATLAB version is in `ising-model-matlab/`.
+The MATLAB version is in `matlab/`.
 
 Run:
 
