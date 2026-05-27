@@ -6,4 +6,4 @@ ipympl
 ipython
 ipywidgets
 mplcursors
-tk
+tqdm
