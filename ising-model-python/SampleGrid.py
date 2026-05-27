@@ -3,9 +3,9 @@ import numpy as np
 from tqdm import tqdm
 
 # Import necessary functions:
-from IsingModel_rawpython.myNeighbors import myNeighbors
-from IsingModel_rawpython.IsingEnergy import IsingEnergy
-from IsingModel_rawpython.WolffIteration import WolffIteration
+from myNeighbors import myNeighbors
+from IsingEnergy import IsingEnergy
+from WolffIteration import WolffIteration
 
 
 def _checkerboard_update(grid, kT, J, sampleHow, update_masks):
