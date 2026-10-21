@@ -14,8 +14,8 @@ def IsingEnergy(grid, J):
     neighbors = np.roll(grid, 1, axis=1) + np.roll(grid, -1, axis=1) + \
                 np.roll(grid, 1, axis=0) + np.roll(grid, -1, axis=0)
 
-    # Calculate total energy
-    energy = -J * np.sum(grid * neighbors) / grid.size
+    # Calculate total energy (each bond appears twice in the sum, hence the 1/2)
+    energy = -J * np.sum(grid * neighbors) / (2 * grid.size)
 
     return energy
 
@@ -61,24 +61,18 @@ def WolffIteration(N, p, grid, adj):
     Ci = np.zeros(N**2, dtype=int)
 
     while len(F) > 0:
-        # Get all neighbors of all frontier spins (vectorized)
-        neighbors = adj[F].reshape(-1)  # Flattened array of all neighbors
+        # Get all neighbors of all frontier spins (vectorized), keeping
+        # duplicates: each entry is one bond, and each bond gets its own trial
+        neighbors = adj[F].reshape(-1)
 
-        # Only choose neighbors parallel to the seed spin (vectorized)
-        parallel_mask = [grid.flat[n] == s for n in neighbors]
-        F = neighbors[parallel_mask]
-
-        # Find elements that aren't in the cluster (using indicator arrays)
+        # Only choose neighbors parallel to the seed spin and not already in the cluster
         Ci[C] = 1
-        Fi = np.zeros(N**2, dtype=int)
-        Fi[F] = 1
+        neighbors = neighbors[(grid.flat[neighbors] == s) & (Ci[neighbors] == 0)]
 
-        # Elements in frontier but not in cluster
-        F = np.where(Fi - Ci > 0)[0]
-
-        # Apply probability filter (vectorized)
-        r = np.random.random(len(F))
-        F = F[r < p]
+        # Activate each bond with probability p, then remove duplicate sites
+        # (a site touching k cluster spins joins with probability 1 - (1-p)^k)
+        r = np.random.random(len(neighbors))
+        F = np.unique(neighbors[r < p])
 
         # Add to cluster (vectorized)
         C.extend(F)
