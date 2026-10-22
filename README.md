@@ -7,7 +7,7 @@ The code demonstrates:
 - Heat bath, Metropolis, and Wolff sampling
 - Energy and magnetization traces
 - Correlation functions and radial averages
-- Cluster-size visualisation and statistics
+- Cluster-size visualisation and statistics, including an animation of clusters at the critical point
 
 ![Ising model screenshot](img/IsingModelScreenshot.png)
 
@@ -78,7 +78,7 @@ The raw Python modules are in `python/`:
 
 - `IsingSim.py`: runs a full simulation and plots animation, correlations, energy, and magnetization
 - `SampleGrid.py`: implements Heat Bath, Metropolis, and Wolff sampling
-- `ClusterSizeStats.py`: plots spin clusters and the cluster-size distribution
+- `ClusterSizeStats.py`: plots spin clusters and the cluster-size distribution; run as a script, it animates clusters growing at the critical temperature
 - `CorrelationFun.py`, `RadialAverage.py`, `IsingEnergy.py`: analysis helpers
 - `WolffDemo.py`, `WolffIteration.py`: Wolff cluster update demo and implementation
 
@@ -99,7 +99,8 @@ Useful files:
 - `IsingSim.m`: main simulation script
 - `SampleGrid.m`: Heat Bath, Metropolis, and Wolff sampling
 - `WolffDemo.m`: Wolff cluster update demo
-- `ClusterSizeStats.m`: cluster-size visualisation and statistics (needs the Image Processing Toolbox)
+- `ClusterSizeStats.m`: cluster-size visualisation and statistics (needs the Image Processing Toolbox).
+  Set `plotClusters = true` in `IsingSim.m` to animate the clusters and their size distribution as the grid evolves.
 - `CorrelationFun.m`, `RadialAverage.m`, `IsingEnergy.m`: analysis helpers
 
 ## Notes For Lab Use

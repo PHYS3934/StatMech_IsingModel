@@ -39,6 +39,9 @@ end
 timeLag = 0; % (s) pause after each round of updates (slows down plotting)
 % saveVideo
 saveVideo = false; % saves result to file (as a video).
+% plotClusters, whether to animate the clusters and their size distribution instead of just the grid
+% (try kT = kT_c to see clusters of all sizes, and a power-law distribution of cluster sizes)
+plotClusters = false;
 
 %-------------------------------------------------------------------------------
 % Generate a random initial configuration
@@ -53,7 +56,7 @@ end
 % Run the sampling algorithm
 %-------------------------------------------------------------------------------
 [finalGrid,energies,magnetizations] = ...
-            SampleGrid(grid,kT,J,numTimePoints,everyT,samplingMethod,timeLag,saveVideo);
+            SampleGrid(grid,kT,J,numTimePoints,everyT,samplingMethod,timeLag,saveVideo,plotClusters);
 
 % Time of each stored sample:
 times = (0:length(energies)-1)*everyT/stepsPerTimeUnit;

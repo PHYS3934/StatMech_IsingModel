@@ -22,9 +22,11 @@ from WolffIteration import WolffIteration
 from SampleGrid import SampleGrid
 from CorrelationFun import CorrelationFun
 from RadialAverage import RadialAverage
+from ClusterSizeStats import ClusterSizes
 python_funcs = SimpleNamespace(IsingEnergy=IsingEnergy, myNeighbors=myNeighbors,
                                WolffIteration=WolffIteration, SampleGrid=SampleGrid,
-                               CorrelationFun=CorrelationFun, RadialAverage=RadialAverage)
+                               CorrelationFun=CorrelationFun, RadialAverage=RadialAverage,
+                               ClusterSizes=ClusterSizes)
 
 # The same functions in jupyter/isingsim_funcs.py:
 spec = importlib.util.spec_from_file_location('isingsim_funcs', os.path.join(repo, 'jupyter', 'isingsim_funcs.py'))
@@ -107,11 +109,27 @@ def test_correlation(f):
     print('CorrelationFun and RadialAverage match the direct calculation')
 
 
+def test_clusters(f):
+    # Clusters connect nearest neighbors only, so diagonal spins are separate clusters:
+    checkerboard = np.array([[1, -1], [-1, 1]])
+    clusterSizes, sizeMap = f.ClusterSizes(checkerboard)
+    assert sorted(clusterSizes) == [1, 1, 1, 1] and np.all(sizeMap == 1)
+    # An up cluster of 3 spins (an L shape), and the 6 down spins around it:
+    grid = np.array([[1, 1, -1],
+                     [1, -1, -1],
+                     [-1, -1, -1]])
+    clusterSizes, sizeMap = f.ClusterSizes(grid)
+    assert sorted(clusterSizes) == [3, 6]
+    assert np.array_equal(sizeMap, np.where(grid > 0, 3, 6))
+    print('ClusterSizes finds the expected clusters')
+
+
 if __name__ == '__main__':
     for name, f in ALL_FUNCS.items():
         print(f'--- {name}')
         test_energy_ground_state(f)
         test_correlation(f)
+        test_clusters(f)
         test_wolff(f)
         test_single_spin(f)
     print('All tests passed')
