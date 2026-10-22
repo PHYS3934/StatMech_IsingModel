@@ -3,5 +3,4 @@ __pycache__/
 *.pyc
 .ipynb_checkpoints/
 *.gif
-!img/*.gif
 *.mp4
