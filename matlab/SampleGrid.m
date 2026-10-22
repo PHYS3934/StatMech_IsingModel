@@ -1,4 +1,4 @@
-function [grid,energyStore,M_store] = SampleGrid(grid,kT,J,numTimePoints,everyT,sampleHow,timeLag,saveVideo)
+function [grid,energyStore,M_store] = SampleGrid(grid,kT,J,numTimePoints,everyT,sampleHow,timeLag,saveVideo,plotClusters)
 % Evolve a 2D Ising spin configuration using a Markov chain Monte Carlo sampler,
 % plotting the grid as it evolves.
 %
@@ -12,6 +12,8 @@ function [grid,energyStore,M_store] = SampleGrid(grid,kT,J,numTimePoints,everyT,
 %         - sampleHow: 'HeatBath', 'Metropolis' (default), or 'Wolff'
 %         - timeLag: pause (in seconds) after each plot (default 0)
 %         - saveVideo: whether to save the animation to IsingSim.mp4 (default false)
+%         - plotClusters: whether to animate the clusters and their size distribution
+%                         (with ClusterSizeStats) instead of just the grid (default false)
 % OUTPUTS: - grid: the final spin configuration
 %          - energyStore: energy per spin at each stored time (starting with the initial grid)
 %          - M_store: magnetization per spin at each stored time (starting with the initial grid)
@@ -28,6 +30,9 @@ if nargin < 7
 end
 if nargin < 8
     saveVideo = false;
+end
+if nargin < 9
+    plotClusters = false;
 end
 if ~ismember(sampleHow,{'HeatBath','Metropolis','Wolff'})
     error('Unknown sampling method ''%s''',sampleHow);
@@ -59,7 +64,13 @@ M_store(1) = mean(grid(:));
 energyStore(1) = IsingEnergy(grid,J);
 f1 = figure(1);
 f1.Color = 'w';
-h_Image = IsingPlot(grid,N,J,kT,M_store(1),energyStore(1));
+if plotClusters
+    f1.Position(3) = max(f1.Position(3),1200); % wide enough for three panels
+    ClusterSizeStats(grid);
+    drawnow
+else
+    h_Image = IsingPlot(grid,N,J,kT,M_store(1),energyStore(1));
+end
 
 %-------------------------------------------------------------------------------
 % Evolve the Markov chain for numTimePoints steps
@@ -105,7 +116,12 @@ for t = 1:numTimePoints
         k = t/everyT + 1; % index of this sample (the initial grid is sample 1)
         M_store(k) = mean(grid(:));
         energyStore(k) = IsingEnergy(grid,J);
-        h_Image = IsingPlot(grid,N,J,kT,M_store(k),energyStore(k),h_Image);
+        if plotClusters
+            ClusterSizeStats(grid);
+            drawnow
+        else
+            h_Image = IsingPlot(grid,N,J,kT,M_store(k),energyStore(k),h_Image);
+        end
 
         % Pause if required:
         if timeLag > 0
