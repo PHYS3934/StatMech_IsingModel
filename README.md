@@ -1,6 +1,6 @@
 # 2D Ising Model
 
-This repo contains code for simulating the 2D Ising model on a square lattice with Jupyter notebooks for class/lab use, standalone Python scripts, and the original MATLAB version.
+This repo contains code for simulating the 2D Ising model on a square lattice with Jupyter notebooks, standalone Python scripts (and the original MATLAB version for those crazy enough).
 
 The code demonstrates:
 
