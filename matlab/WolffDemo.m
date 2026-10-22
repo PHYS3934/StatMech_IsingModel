@@ -26,35 +26,44 @@ subplot(5,1,5)
 r = corr(grid(:),grid0(:));
 h_r = plot(r,'.-k');
 xlabel('Iteration')
-ylabel('Corr0')
+ylabel('Corr. with initial grid')
 ylim([-0.1,1])
 title(r)
 
 %-------------------------------------------------------------------------------
-% Compute cluster growth probability (based on J/kT)
+% Probability of adding a parallel neighbor to the cluster (activating a bond)
 p = 1 - exp(-2*J/kT);
 fprintf(1,'Iteratively add neighbor to cluster with probability %.3f\n',p);
 
 %-------------------------------------------------------------------------------
+% Step through the algorithm: show the seed, then its cluster, then flip the cluster
+% (press Enter to continue; type anything then Enter to stop)
 adj = myNeighbors(1:N^2,N);
 reply = '';
 subplot(5,1,1:4)
 while isempty(reply)
-    [C,seed] = WolffIteration(N,p,grid,adj);
+    % Grow a cluster from a random seed spin:
+    [cluster,seed] = WolffIteration(N,p,grid,adj);
+
+    % Show the seed (grid values 2) and then the cluster (grid values 3):
+    displayGrid = grid;
+    displayGrid(seed) = 2;
+    h_image.CData = displayGrid;
+    title('SEED')
+    reply = input('What do you think of my seed?','s');
+    displayGrid(cluster) = 3;
+    displayGrid(seed) = 2;
+    h_image.CData = displayGrid;
+    title('CLUSTER')
+    reply = input('What do you think of my cluster?','s');
+
+    % Flip every spin in the cluster:
+    grid(cluster) = -grid(cluster);
+    h_image.CData = grid;
+    title('FLIPPED')
+
+    % Track the correlation with the initial grid:
     r = [r; corr(grid(:),grid0(:))];
     h_r.XData = 1:length(r);
     h_r.YData = r;
-
-    theNewSpin = -grid(seed);
-    grid(seed) = 2;
-    h_image.CData = grid;
-    title('SEED')
-    reply = input('What do you think of my seed?','s');
-    grid(C) = 3;
-    grid(seed) = 2;
-    h_image.CData = grid;
-    title('CLUSTER')
-    reply = input('What do you think of my cluster?','s');
-    grid(C) = theNewSpin;
-
 end

@@ -49,16 +49,17 @@ Use these for teaching and interactive exploration:
 
 - `jupyter/IsingSim.ipynb`: main simulation notebook
 - `jupyter/WolffDemo.ipynb`: interactive Wolff cluster update demo
-- `jupyter/isingsim_funcs.py`: helper functions used by `IsingSim.ipynb`
-- `jupyter/wolffdemo_funcs.py`: helper functions used by `WolffDemo.ipynb`
+- `jupyter/isingsim_funcs.py`: helper functions used by both notebooks (the same functions as in `python/`)
+- `jupyter/wolffdemo_funcs.py`: the interactive Wolff demo used by `WolffDemo.ipynb`
 
 The main notebook keeps the important inputs near the top:
 
 ```python
 N = 100
 J = 1
-kT = 2 / np.log(1 + np.sqrt(2)) * 0.85
-samplingMethod = "HeatBath"
+kT_c = 2 / np.log(1 + np.sqrt(2))
+kT = 0.85 * kT_c
+samplingMethod = 'HeatBath'
 ```
 
 `N` is the side length of the lattice, so the total number of spins is `N**2`. Values around `50` to `200` are sensible for a lab notebook.
@@ -98,20 +99,29 @@ Useful files:
 - `IsingSim.m`: main simulation script
 - `SampleGrid.m`: Heat Bath, Metropolis, and Wolff sampling
 - `WolffDemo.m`: Wolff cluster update demo
-- `ClusterSizeStats.m`: cluster-size visualisation and statistics
+- `ClusterSizeStats.m`: cluster-size visualisation and statistics (needs the Image Processing Toolbox)
 - `CorrelationFun.m`, `RadialAverage.m`, `IsingEnergy.m`: analysis helpers
 
 ## Notes For Lab Use
 
 - Start with `N = 100` for quick feedback.
 - Increase `N` only gradually; memory scales as `N**2`.
-- `HeatBath` and `Metropolis` use sweep-based updates when the sampling interval is one lattice sweep.
-- `Wolff` updates whole clusters and can decorrelate faster near the critical temperature.
+- `HeatBath` and `Metropolis` update one randomly chosen spin per step, so `N**2` steps make one sweep of the lattice.
+  At `N = 100`, the default 100 sweeps take about 5–10 s in Python.
+- `Wolff` flips a whole cluster per step and can decorrelate much faster near the critical temperature.
+  Starting from a random grid, its clusters are small at first and grow as the grid orders.
 
 ## Tests
 
-`tests/test_exact.py` checks the Python samplers against exact enumeration of a 4x4 periodic lattice (about 10 s):
+`tests/test_exact.py` checks the samplers against exact enumeration of a 4x4 periodic lattice, and the correlation functions against a direct calculation.
+It runs on both copies of the Python functions (`python/` and `jupyter/isingsim_funcs.py`) and takes about 25 s:
 
 ```bash
 python tests/test_exact.py
+```
+
+`tests/test_exact.m` runs the same checks on the MATLAB functions:
+
+```matlab
+run('tests/test_exact.m')
 ```

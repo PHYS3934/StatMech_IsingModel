@@ -2,7 +2,8 @@ function grid = ProppWilson(N,kT,J)
 % Exact sampling of the Ising Model via the Propp-Wilson algorithm
 %-------------------------------------------------------------------------------
 
-% Intialization
+% Initialization: chain 1 starts all up, chain 2 all down.
+% Both chains use the same random numbers, so once they agree, they agree forever (coalescence).
 grid = ones(N,N,2); grid(:,:,2) = -grid(:,:,2);
 scale = 2*J/kT;
 p = 1./(1+exp(-scale*[-4:2:4])); % precompute allowed probability values
@@ -10,7 +11,7 @@ k = 1;
 V = randi(N,2,2^(k-1));
 U = rand(1);
 while (~isequal(grid(:,:,1),grid(:,:,2)))
-    display(k); % so you know how long it's running
+    fprintf(1,'k = %u\n',k); % so you know how long it's running
     % Pick 2^(k-1) vertices uniformly at random
     V = [randi(N,2,2^(k-1)) V];
     % Pick 2^k uniform variables (to use for changing state)
@@ -39,12 +40,13 @@ while (~isequal(grid(:,:,1),grid(:,:,2)))
         end
     end
     k = k+1;
-    M = sum(sum(grid))/numel(grid(:,:,1));
-    E = IsingEnergy(grid,J);
-    subplot(121)
-    IsingPlot(grid(:,:,1),N,J,kT,M(1),E(1));
-    subplot(122)
-    IsingPlot(grid(:,:,2),N,J,kT,M(1),E(1));
+    % Plot both chains, each with its own magnetization and energy per spin:
+    for c = 1:2
+        subplot(1,2,c)
+        M = mean(mean(grid(:,:,c)));
+        E = IsingEnergy(grid(:,:,c),J);
+        IsingPlot(grid(:,:,c),N,J,kT,M,E);
+    end
 end
 
 grid = grid(:,:,1);

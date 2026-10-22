@@ -11,19 +11,20 @@ clusterSizes = [[SS1.Area],[SS2.Area]]; % cluster areas
 %-------------------------------------------------------------------------------
 % Logarithmic binning
 %-------------------------------------------------------------------------------
-numBins = ceil(min(length(unique(clusterSizes)/5),12));
+numBins = min(floor(length(unique(clusterSizes))/5),12);
+numBins = max(numBins,2); % histcounts needs at least two bin edges
 
 % log10-spaced bin edges:
 binEdges = logspace(log10(min(clusterSizes*0.9999)),log10(max(clusterSizes*1.0001)),numBins);
 
 % Bin the data using custom bin edges:
-[N,binEdges] = histcounts(clusterSizes,binEdges);
+[counts,binEdges] = histcounts(clusterSizes,binEdges);
 
 % Bin centers as middle points between bin edges:
 binCenters = mean([binEdges(1:end-1);binEdges(2:end)]);
 
 % Convert counts to probabilities:
-Nnorm = N/sum(N);
+probabilities = counts/sum(counts);
 
 %-------------------------------------------------------------------------------
 % PLOTTING
@@ -41,7 +42,7 @@ RGB2 = label2rgb(L2,'lines','k','noshuffle');
 imagesc(RGB1 + RGB2)
 axis('square')
 subplot(1,3,3)
-loglog(binCenters,Nnorm,'o-k')
+loglog(binCenters,probabilities,'o-k')
 xlabel('Cluster size')
 ylabel('Probability')
 

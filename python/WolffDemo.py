@@ -1,16 +1,18 @@
-# Import neceesary libraries:
+# Interactive demo of the Wolff cluster algorithm: step through choosing a seed spin,
+# growing its cluster, and flipping it, while tracking the correlation with the initial grid.
+
+# Import necessary libraries:
 import numpy as np
 from numpy.random import rand
 from scipy.stats import pearsonr
 import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
 import matplotlib
 import tkinter as tk
 from tkinter import ttk
 matplotlib.use('TkAgg')  
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-# Import neceesary functions:
+# Import necessary functions:
 from myNeighbors import myNeighbors
 from WolffIteration import WolffIteration
 
@@ -20,6 +22,7 @@ class WolffDemo:
         self.N = N
         self.J = 1
         self.kT = 2/np.log(1 + np.sqrt(2)) * 1.0  # T_c
+        # Probability of adding a parallel neighbor to the cluster (activating a bond):
         self.p = 1 - np.exp(-2*self.J/self.kT)
 
         # Initialize grids with -1 and 1
@@ -29,7 +32,9 @@ class WolffDemo:
         # Get adjacency information
         self.adj = myNeighbors(np.arange(N*N), N)
         
-        # Initialize state tracking
+        # Initialize state tracking. The demo cycles through three states:
+        # 'initial' (choose a seed) -> 'seed' (grow its cluster) -> 'cluster' (flip it)
+        # Correlation with the initial grid shows how quickly the grid decorrelates:
         self.correlations = [pearsonr(self.grid.flatten(), self.grid0.flatten())[0]]
         self.state = 'initial'
         self.iteration = 0
@@ -88,10 +93,6 @@ class WolffDemo:
         self.speed_scale.set(50)  # Set initial value
         self.speed_scale.pack(side=tk.LEFT, padx=5)
         
-        # Create a single state label that gets updated with both pieces of info
-        self.state_label = ttk.Label(self.control_frame, text='Initial State    Correlation: 1.000')
-        self.state_label.pack(side=tk.LEFT, padx=15)
-        
         self.status_label = ttk.Label(self.control_frame, text='Initial State')
         self.status_label.pack(side=tk.LEFT, padx=15, pady=5)
         
@@ -143,7 +144,7 @@ class WolffDemo:
         ax2 = self.fig.add_subplot(self.gs[4])
         ax2.plot(self.correlations, '.-k', linewidth=2)  
         ax2.set_xlabel('Iteration')
-        ax2.set_ylabel('Corr0')
+        ax2.set_ylabel('Corr. with\ninitial grid')
         ax2.set_yticks([0, 0.5, 1])
         ax2.set_ylim(0, 1)  
         ax2.grid(False) 
@@ -156,29 +157,26 @@ class WolffDemo:
     def step(self):
         """Advance the simulation one step"""
         if self.state == 'initial':
-            # Get cluster update
-            self.C, self.seed = WolffIteration(self.N, self.p, self.grid, self.adj)
-            self.theNewSpin = -self.grid[np.unravel_index(self.seed, (self.N,self.N))]
-            
+            # Grow a cluster (the display shows its seed first, then the whole cluster)
+            self.cluster, self.seed = WolffIteration(self.N, self.p, self.grid, self.adj)
+
             # Show seed
             self.grid_display = np.where(self.grid == -1, 0, 1)
-            self.grid_display[np.unravel_index(self.seed, (self.N,self.N))] = 2
+            self.grid_display.flat[self.seed] = 2
             self.status_label.configure(text='Seed Selected')
             self.state = 'seed'
             
         elif self.state == 'seed':
             # Show cluster
             self.grid_display = np.where(self.grid == -1, 0, 1)
-            for c in self.C:
-                self.grid_display[np.unravel_index(c, (self.N,self.N))] = 3
-            self.grid_display[np.unravel_index(self.seed, (self.N,self.N))] = 2
+            self.grid_display.flat[self.cluster] = 3
+            self.grid_display.flat[self.seed] = 2
             self.status_label.configure(text='Cluster Found')
             self.state = 'cluster'
             
         elif self.state == 'cluster':
-            # Update spins
-            for c in self.C:
-                self.grid[np.unravel_index(c, (self.N,self.N))] = self.theNewSpin
+            # Flip every spin in the cluster
+            self.grid.flat[self.cluster] = -self.grid.flat[self.cluster]
             self.grid_display = np.where(self.grid == -1, 0, 1)
             
             # Update correlation
