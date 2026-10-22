@@ -102,25 +102,19 @@ def WolffIteration(N, p, grid, adj):
     Ci = np.zeros(N**2, dtype=int)
     
     while len(F) > 0:
-        # Get all neighbors of all frontier spins (vectorized)
-        neighbors = adj[F].reshape(-1)  # Flattened array of all neighbors
-        
-        # Only choose neighbors parallel to the seed spin (vectorized)
-        parallel_mask = [grid.flat[n] == s for n in neighbors]
-        F = neighbors[parallel_mask]
-        
-        # Find elements that aren't in the cluster (using indicator arrays)
+        # Get all neighbors of all frontier spins (vectorized), keeping
+        # duplicates: each entry is one bond, and each bond gets its own trial
+        neighbors = adj[F].reshape(-1)
+
+        # Only choose neighbors parallel to the seed spin and not already in the cluster
         Ci[C] = 1
-        Fi = np.zeros(N**2, dtype=int)
-        Fi[F] = 1
-        
-        # Elements in frontier but not in cluster
-        F = np.where(Fi - Ci > 0)[0]
-        
-        # Apply probability filter (vectorized)
-        r = np.random.random(len(F))
-        F = F[r < p]
-        
+        neighbors = neighbors[(grid.flat[neighbors] == s) & (Ci[neighbors] == 0)]
+
+        # Activate each bond with probability p, then remove duplicate sites
+        # (a site touching k cluster spins joins with probability 1 - (1-p)^k)
+        r = np.random.random(len(neighbors))
+        F = np.unique(neighbors[r < p])
+
         # Add to cluster (vectorized)
         C.extend(F)
     

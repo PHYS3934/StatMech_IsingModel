@@ -3,6 +3,7 @@ function energy = IsingEnergy(grid,J)
 
 neighbors = circshift(grid,[0 1]) + circshift(grid,[0 -1]) + ...
             circshift(grid,[1 0]) + circshift(grid,[-1 0]);
-energy = -J*sum(sum(grid.*neighbors))/numel(grid);
+% Each bond appears twice in the sum, hence the 1/2:
+energy = -J*sum(sum(grid.*neighbors))/(2*numel(grid));
 
 end

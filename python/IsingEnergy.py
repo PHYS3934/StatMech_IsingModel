@@ -9,7 +9,7 @@ def IsingEnergy(grid, J):
     neighbors = np.roll(grid, 1, axis=1) + np.roll(grid, -1, axis=1) + \
                 np.roll(grid, 1, axis=0) + np.roll(grid, -1, axis=0)
 
-    # Calculate total energy
-    energy = -J * np.sum(grid * neighbors) / grid.size
+    # Calculate total energy (each bond appears twice in the sum, hence the 1/2)
+    energy = -J * np.sum(grid * neighbors) / (2 * grid.size)
 
     return energy

@@ -10,13 +10,12 @@ Ci = zeros(N^2,1); % indicator function for cluster elements
 
 while ~isempty(F)
     F = adj(F,:); % Compute the new neighboring spins
-    F = F(grid(F(:)) == s); % only choose ones parallel to the seed spin
-    % Find elements that aren't in the cluster
-    Fi = zeros(N^2,1); % indicator function for the frontier spins
+    F = F(:); % keep duplicates: each entry is one bond, with its own trial
     Ci(C) = 1;
-    Fi(F) = 1;
-    F = find(Fi - Ci > 0);
-    F = F(rand(1,length(F)) < p); % keep spins only with probability p
+    F = F(grid(F) == s & Ci(F) == 0); % only parallel spins not already in the cluster
+    % Activate each bond with probability p, then remove duplicate sites
+    % (a site touching k cluster spins joins with probability 1 - (1-p)^k)
+    F = unique(F(rand(length(F),1) < p));
     C(end+1:end+length(F)) = F; % add to cluster
 end
 

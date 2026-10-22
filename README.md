@@ -107,3 +107,11 @@ Useful files:
 - Increase `N` only gradually; memory scales as `N**2`.
 - `HeatBath` and `Metropolis` use sweep-based updates when the sampling interval is one lattice sweep.
 - `Wolff` updates whole clusters and can decorrelate faster near the critical temperature.
+
+## Tests
+
+`tests/test_exact.py` checks the Python samplers against exact enumeration of a 4x4 periodic lattice (about 10 s):
+
+```bash
+python tests/test_exact.py
+```
