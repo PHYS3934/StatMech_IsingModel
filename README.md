@@ -9,9 +9,16 @@ The code demonstrates:
 - Correlation functions and radial averages
 - Cluster-size visualisation and statistics
 
-![An equilibrium spin configuration at the critical temperature](img/spins_critical.png)
+<table>
+  <tr>
+    <td align="center"><img src="img/spins_below.gif" width="256" alt="Heat-bath sampling below the critical temperature"><br>Below <i>T</i><sub>c</sub> (0.9 <i>T</i><sub>c</sub>): ordered</td>
+    <td align="center"><img src="img/spins_critical.gif" width="256" alt="Heat-bath sampling at the critical temperature"><br>At <i>T</i><sub>c</sub>: domains of all sizes</td>
+    <td align="center"><img src="img/spins_above.gif" width="256" alt="Heat-bath sampling above the critical temperature"><br>Above <i>T</i><sub>c</sub> (1.2 <i>T</i><sub>c</sub>): disordered</td>
+  </tr>
+</table>
 
-*An equilibrium spin configuration of a 256 x 256 lattice at the critical temperature (black = up, white = down).*
+*Heat-bath sampling of a 128 x 128 lattice in equilibrium (black = up, white = down), with a frame every 2 sweeps.
+Near T<sub>c</sub>, large domains change slowly: critical slowing down.*
 
 <table>
   <tr>
