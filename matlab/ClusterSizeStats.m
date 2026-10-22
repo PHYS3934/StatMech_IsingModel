@@ -1,49 +1,83 @@
 function clusterSizes = ClusterSizeStats(grid)
-% Get statistics on cluster sizes
+% Get statistics on cluster sizes, where a cluster is a connected region of parallel spins
+% (nearest neighbors only; clusters are not joined across the periodic boundaries).
+% Plots the grid, its clusters (colored by direction and size), and the distribution of
+% cluster sizes; returns the cluster sizes.
+% Call it repeatedly as a grid evolves to animate the clusters (see the plotClusters option of SampleGrid).
+% Needs the Image Processing Toolbox (for bwconncomp).
 %-------------------------------------------------------------------------------
 
-CC1 = bwconncomp(grid > 0);
-SS1 = regionprops(CC1,'Area');
-CC2 = bwconncomp(grid < 0);
-SS2 = regionprops(CC2,'Area');
-clusterSizes = [[SS1.Area],[SS2.Area]]; % cluster areas
+%-------------------------------------------------------------------------------
+% Find the clusters
+%-------------------------------------------------------------------------------
+clusterSizes = [];
+sizeMap = zeros(size(grid)); % the size of the cluster that each spin belongs to
+for spin = [1,-1]
+    % Connected regions of this spin direction (4: connect nearest neighbors only, not diagonals):
+    CC = bwconncomp(grid == spin,4);
+    sizes = cellfun(@numel,CC.PixelIdxList);
+    % Give each spin the size of its cluster:
+    for k = 1:CC.NumObjects
+        sizeMap(CC.PixelIdxList{k}) = sizes(k);
+    end
+    clusterSizes = [clusterSizes,sizes];
+end
 
 %-------------------------------------------------------------------------------
 % Logarithmic binning
 %-------------------------------------------------------------------------------
-numBins = min(floor(length(unique(clusterSizes))/5),12);
-numBins = max(numBins,2); % histcounts needs at least two bin edges
+% log10-spaced bin edges from 1 to the number of spins (the largest possible cluster).
+% Using the same bins for every grid of a given size lets us compare grids directly.
+numBins = 20;
+binEdges = logspace(0,log10(numel(grid)+1),numBins+1);
 
-% log10-spaced bin edges:
-binEdges = logspace(log10(min(clusterSizes*0.9999)),log10(max(clusterSizes*1.0001)),numBins);
-
-% Bin the data using custom bin edges:
-[counts,binEdges] = histcounts(clusterSizes,binEdges);
-
-% Bin centers as middle points between bin edges:
-binCenters = mean([binEdges(1:end-1);binEdges(2:end)]);
-
-% Convert counts to probabilities:
+% Count the clusters in each bin, and convert counts to probabilities:
+counts = histcounts(clusterSizes,binEdges);
 probabilities = counts/sum(counts);
+
+% Bin centers, as the geometric mean of the bin edges (the midpoint on a log scale):
+binCenters = sqrt(binEdges(1:end-1).*binEdges(2:end));
+
+%-------------------------------------------------------------------------------
+% Color each spin by its cluster's direction and size:
+% up clusters from red (small) to yellow (large), down clusters from blue (small) to green (large).
+% Neighboring clusters always point in opposite directions, so they always get different colors.
+%-------------------------------------------------------------------------------
+logSize = log(sizeMap)/log(numel(grid)); % from 0 (one spin) to 1 (the whole grid)
+colorsUp = ind2rgb(round(255*logSize) + 1,autumn(256));
+colorsDown = ind2rgb(round(255*logSize) + 1,winter(256));
+isUp = repmat(grid > 0,1,1,3);
+clusterColors = colorsDown;
+clusterColors(isUp) = colorsUp(isUp);
 
 %-------------------------------------------------------------------------------
 % PLOTTING
 %-------------------------------------------------------------------------------
-% f = figure('color','w');
+% The spin configuration:
 subplot(1,3,1)
 imagesc(grid)
+colormap(gca,[0,0,0;1,1,1])
+caxis([-1,1])
 axis('square')
-colormap([0,0,0;1,1,1])
+set(gca,'XTick',[],'YTick',[])
+title('Spins')
+
+% Each cluster colored by its direction and size:
 subplot(1,3,2)
-L1 = labelmatrix(CC1);
-L2 = labelmatrix(CC2);
-RGB1 = label2rgb(L1,'jet','k','noshuffle');
-RGB2 = label2rgb(L2,'lines','k','noshuffle');
-imagesc(RGB1 + RGB2)
+image(clusterColors)
 axis('square')
+set(gca,'XTick',[],'YTick',[])
+title('Clusters, colored by size')
+xlabel({'up: red (small) to yellow (large)','down: blue (small) to green (large)'})
+
+% The distribution of cluster sizes (empty bins are left out of the log-log plot):
 subplot(1,3,3)
-loglog(binCenters,probabilities,'o-k')
+show = probabilities > 0;
+loglog(binCenters(show),probabilities(show),'o-k')
+xlim([0.7,numel(grid)*1.5])
+axis('square')
 xlabel('Cluster size')
 ylabel('Probability')
+title('Cluster-size distribution')
 
 end

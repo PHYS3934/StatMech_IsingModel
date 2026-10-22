@@ -29,6 +29,20 @@ end
 fprintf(1,'CorrelationFun and RadialAverage match the direct calculation\n');
 
 %-------------------------------------------------------------------------------
+% Clusters connect nearest neighbors only, so diagonal spins are separate clusters
+% (ClusterSizeStats needs the Image Processing Toolbox)
+%-------------------------------------------------------------------------------
+if license('test','Image_Toolbox') && ~isempty(ver('images'))
+    f = figure('Visible','off');
+    assert(isequal(sort(ClusterSizeStats([1,-1;-1,1])),[1,1,1,1]));
+    assert(isequal(sort(ClusterSizeStats([1,1,-1;1,-1,-1;-1,-1,-1])),[3,6]));
+    close(f);
+    fprintf(1,'ClusterSizeStats finds the expected clusters\n');
+else
+    fprintf(1,'Skipping ClusterSizeStats (no Image Processing Toolbox)\n');
+end
+
+%-------------------------------------------------------------------------------
 % Wolff sampling on a 4x4 lattice at kT = 2.5 against exact enumeration
 % (<|m|> = 0.7647, energy per spin = -1.3791)
 %-------------------------------------------------------------------------------
