@@ -1,41 +1,48 @@
+# Import libraries:
 import numpy as np
 
 def WolffIteration(N, p, grid, adj):
     """
-    Find a cluster according to the Wolff sampling rule - MATLAB-like implementation
+    Grow one cluster of spins according to the Wolff rule.
+
+    Starting from a random seed spin, the cluster grows outwards one shell at a time.
+    Each bond between a cluster spin and a parallel neighbor outside the cluster is
+    activated with probability p = 1 - exp(-2J/kT), and a neighbor joins the cluster
+    if at least one of its bonds to the cluster is activated.
+
+    INPUTS: - N: linear size of the lattice (N x N spins)
+            - p: probability of activating a bond
+            - grid: the N x N spin configuration (not modified here)
+            - adj: N^2 x 4 array of the neighbors of each spin (from myNeighbors)
+    OUTPUTS: - cluster: linear indices of the spins in the cluster
+             - seed: linear index of the seed spin
     """
-    import numpy as np
-    
-    # Random seed spin (0-indexed for Python)
-    i = np.random.randint(0, N**2)
-    
-    # The cluster (initialized with seed)
-    C = [i]
-    
-    # The frontier of spins
-    F = [i]
-    
-    # Seed spin direction
-    s = grid.flat[i]
-    
-    # Indicator function for cluster elements
-    Ci = np.zeros(N**2, dtype=int)
-    
-    while len(F) > 0:
-        # Get all neighbors of all frontier spins (vectorized), keeping
-        # duplicates: each entry is one bond, and each bond gets its own trial
-        neighbors = adj[F].reshape(-1)
+    # Pick a random seed spin (as a linear index into grid.flat):
+    seed = np.random.randint(0, N**2)
+    seedSpin = grid.flat[seed]  # the cluster contains only spins pointing this way
 
-        # Only choose neighbors parallel to the seed spin and not already in the cluster
-        Ci[C] = 1
-        neighbors = neighbors[(grid.flat[neighbors] == s) & (Ci[neighbors] == 0)]
+    # Keep track of which spins are in the cluster:
+    inCluster = np.zeros(N**2, dtype=bool)
+    inCluster[seed] = True
 
-        # Activate each bond with probability p, then remove duplicate sites
-        # (a site touching k cluster spins joins with probability 1 - (1-p)^k)
-        r = np.random.random(len(neighbors))
-        F = np.unique(neighbors[r < p])
+    # The frontier: spins that joined in the last step, whose bonds have not been tried yet
+    frontier = np.array([seed])
 
-        # Add to cluster (vectorized)
-        C.extend(F)
-    
-    return C, i
+    while len(frontier) > 0:
+        # All bonds from the frontier to its neighbors. There is one entry per bond, so a
+        # neighbor touching two frontier spins appears twice and gets two chances to join:
+        neighbors = adj[frontier].reshape(-1)
+
+        # Only bonds to parallel spins that are not already in the cluster can be activated:
+        candidates = neighbors[(grid.flat[neighbors] == seedSpin) & ~inCluster[neighbors]]
+
+        # Activate each bond with probability p:
+        activated = candidates[np.random.random(len(candidates)) < p]
+
+        # The newly joined spins (each counted once) form the next frontier:
+        frontier = np.unique(activated)
+        inCluster[frontier] = True
+
+    cluster = np.flatnonzero(inCluster)
+
+    return cluster, seed
