@@ -9,7 +9,22 @@ The code demonstrates:
 - Correlation functions and radial averages
 - Cluster-size visualisation and statistics, including an animation of clusters at the critical point
 
-![Ising model screenshot](img/IsingModelScreenshot.png)
+![Clusters forming at the critical temperature: spins, clusters colored by size, and the cluster-size distribution](img/critical_clusters.gif)
+
+*Heat-bath sampling at the critical temperature, starting from random spins.
+Clusters (up: red to yellow, down: blue to green, small to large) merge and grow, and the cluster-size distribution approaches a power law (earlier frames in gray).*
+
+<table>
+  <tr>
+    <td align="center"><img src="img/clusters_below.png" width="260" alt="Clusters below the critical temperature"><br>Below <i>T</i><sub>c</sub>: one cluster spans the lattice</td>
+    <td align="center"><img src="img/clusters_critical.png" width="260" alt="Clusters at the critical temperature"><br>At <i>T</i><sub>c</sub>: clusters of every size</td>
+    <td align="center"><img src="img/clusters_above.png" width="260" alt="Clusters above the critical temperature"><br>Above <i>T</i><sub>c</sub>: only small clusters</td>
+  </tr>
+  <tr>
+    <td align="center"><img src="img/wolff_cluster.png" width="260" alt="A Wolff cluster grown from a seed spin"><br>Wolff demo: a cluster (peach) grown from its seed (circled)</td>
+    <td align="center" colspan="2"><img src="img/correlation.png" width="540" alt="Spin-spin correlation function and its radial average"><br>Spin-spin correlations at <i>T</i><sub>c</sub>, decaying slowly with distance</td>
+  </tr>
+</table>
 
 ## Setup
 
